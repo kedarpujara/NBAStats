@@ -27,7 +27,7 @@ const Standings = () => {
     }
 
     const conference = standings?.children?.find(c => c.abbreviation === activeConf);
-    const entries = conference?.standings?.entries || [];
+    const entries = [...(conference?.standings?.entries || [])].reverse();
 
     return (
         <div className="standings-view">

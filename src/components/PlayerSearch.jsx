@@ -45,7 +45,7 @@ const PlayerSearch = () => {
 
             <div className="search-results">
                 {results.map((player) => (
-                    <div key={player.id} className="result-item glass-card" onClick={() => setSelectedPlayerId(player.id)}>
+                    <div key={player.id} className="result-item glass-card" onClick={() => setSelectedPlayerId(player.numericalId || player.id)}>
                         <div className="result-info">
                             <div className="result-img-wrapper">
                                 {player.image?.default ? (
@@ -62,7 +62,7 @@ const PlayerSearch = () => {
                     </div>
                 ))}
                 {results.length === 0 && !loading && query && (
-                    <div className="no-data">No players found matching your search.</div>
+                    <div className="no-data">No NBA players found matching your search.</div>
                 )}
             </div>
         </div>

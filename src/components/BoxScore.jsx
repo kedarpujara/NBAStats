@@ -1,4 +1,5 @@
 import React from 'react';
+import { extractNumericalId } from '../services/espnApi';
 
 const BoxScore = ({ players = [], teamInfo = {}, onPlayerClick }) => {
     // ESPN Stats mapping
@@ -19,9 +20,12 @@ const BoxScore = ({ players = [], teamInfo = {}, onPlayerClick }) => {
             const stats = p.stats || [];
             if (!p.athlete) return null;
 
+            // Ensure we use the numerical ID for detail calls
+            const safePlayerId = extractNumericalId(p.athlete.id);
+
             return (
-                <tr key={p.athlete.id} onClick={() => onPlayerClick?.(p.athlete.id)} className="clickable-row">
-                    <td className="player-cell">
+                <tr key={p.athlete.id} onClick={() => onPlayerClick?.(safePlayerId)} className="clickable-row">
+                    <td className="player-cell sticky-col">
                         <div className="player-mini-info">
                             {p.athlete.headshot?.href ? (
                                 <img src={p.athlete.headshot.href} alt="" className="player-tiny-headshot" />
@@ -56,14 +60,14 @@ const BoxScore = ({ players = [], teamInfo = {}, onPlayerClick }) => {
         <div className="boxscore-section">
             <div className="boxscore-header">
                 {teamLogo && <img src={teamLogo} alt="" className="team-logo-small" />}
-                <h2>{teamInfo.displayName || 'Team'} Box Score</h2>
+                <h2>{teamInfo.displayName || 'Team'}</h2>
             </div>
 
             <div className="table-wrapper glass-card">
                 <table className="boxscore-table">
                     <thead>
                         <tr>
-                            <th className="text-left">Player</th>
+                            <th className="player-cell sticky-col">Player</th>
                             <th>MIN</th>
                             <th>PTS</th>
                             <th>FG</th>
@@ -88,17 +92,20 @@ const BoxScore = ({ players = [], teamInfo = {}, onPlayerClick }) => {
                         {dnp.length > 0 && (
                             <>
                                 <tr className="sub-header-row"><td colSpan="11">DNP</td></tr>
-                                {dnp.map(p => (
-                                    <tr key={p.athlete?.id || Math.random()} className="dnp-row clickable-row" onClick={() => onPlayerClick?.(p.athlete.id)}>
-                                        <td className="player-cell">
-                                            <div className="player-mini-info">
-                                                {p.athlete.headshot?.href && <img src={p.athlete.headshot.href} alt="" className="player-tiny-headshot" />}
-                                                <span className="p-name">{p.athlete?.shortName || 'Unknown'}</span>
-                                            </div>
-                                        </td>
-                                        <td colSpan="10" className="dnp-reason">{p.reason || 'DNP'}</td>
-                                    </tr>
-                                ))}
+                                {dnp.map(p => {
+                                    const dnpPlayerId = extractNumericalId(p.athlete?.id);
+                                    return (
+                                        <tr key={p.athlete?.id || Math.random()} className="dnp-row clickable-row" onClick={() => onPlayerClick?.(dnpPlayerId)}>
+                                            <td className="player-cell sticky-col">
+                                                <div className="player-mini-info">
+                                                    {p.athlete.headshot?.href && <img src={p.athlete.headshot.href} alt="" className="player-tiny-headshot" />}
+                                                    <span className="p-name">{p.athlete?.shortName || 'Unknown'}</span>
+                                                </div>
+                                            </td>
+                                            <td colSpan="10" className="dnp-reason">{p.reason || 'DNP'}</td>
+                                        </tr>
+                                    );
+                                })}
                             </>
                         )}
                     </tbody>

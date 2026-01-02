@@ -1196,3 +1196,304 @@
     .stats-table th:nth-child(n+6), 
     .stats-table td:nth-child(n+6) { display: none; }
 }
+
+/* Mobile Optimization Overrides */
+@media (max-width: 768px) {
+  .sidebar { 
+    display: none; 
+  }
+  
+  .main-content {
+    padding: 1rem;
+    padding-bottom: 5rem; /* Space for bottom nav */
+  }
+
+  .view-header h1 {
+    font-size: 1.75rem;
+  }
+
+  /* Game Detail Mobile Fixes */
+  .game-header-large {
+    padding: 1.5rem;
+  }
+
+  .detail-teams {
+    gap: 1.5rem;
+  }
+
+  .large-logo {
+    width: 60px;
+    height: 60px;
+  }
+
+  .detail-team-name {
+    font-size: 1rem;
+  }
+
+  .detail-score {
+    font-size: 2.5rem;
+  }
+
+  /* Box Score Table Mobile - STICKY PLAYER NAME */
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+    margin: 0 -1rem; /* Full width on mobile */
+    padding: 0 1rem;
+  }
+
+  .boxscore-table {
+    min-width: 600px; /* Force scroll to see all stats */
+  }
+
+  .boxscore-table th, 
+  .boxscore-table td {
+    padding: 0.6rem 0.4rem;
+    font-size: 0.8rem;
+  }
+
+  .player-cell {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    min-width: 140px;
+    background: rgba(20, 20, 25, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+  }
+
+  .player-mini-info {
+    gap: 0.5rem;
+  }
+
+  .player-tiny-headshot {
+    width: 24px;
+    height: 24px;
+  }
+
+  .p-name {
+    font-size: 0.75rem;
+  }
+
+  /* Linescore Table */
+  .linescore-table th, 
+  .linescore-table td {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.75rem;
+  }
+
+  /* Profile Mobile */
+  .profile-header-premium {
+    padding: 1.5rem;
+  }
+
+  .profile-info-main h1 {
+    font-size: 2rem;
+  }
+
+  .profile-headshot-large {
+    width: 150px;
+    height: 110px;
+  }
+}
+
+/* Custom Scrollbar for stats */
+.table-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 3px;
+}
+
+/* Centering & Spacing Refinements */
+@media (max-width: 768px) {
+  .main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem; /* Breathable padding */
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .view-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    width: 100%;
+  }
+
+  /* Consolidation for Box Score */
+  .game-detail, 
+  .player-search-view, 
+  .player-profile-view {
+    width: 100%;
+    max-width: 500px; /* Consolidate in the middle */
+    margin: 0 auto;
+  }
+
+  /* Center the large game header */
+  .game-header-large {
+    width: 100%;
+    margin-bottom: 2rem;
+    align-items: center;
+  }
+
+  .linescore-container {
+    width: 100%;
+    margin: 1.5rem 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  .linescore-table {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Breathable Search Results */
+  .search-results {
+    gap: 2rem;
+    padding: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .result-item {
+    width: 100%;
+    max-width: 400px;
+    padding: 1.5rem;
+  }
+
+  /* Prevent table-wrapper from breaking centering */
+  .table-wrapper {
+    width: calc(100vw - 3rem); /* Stay within centered main-content */
+    margin: 1rem auto;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  .boxscore-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .boxscore-header {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+/* Horizontal Mobile Header */
+.horizontal-teams {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.medium-logo {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
+.team-text-meta {
+    display: flex;
+    flex-direction: column;
+}
+
+.team-text-meta.align-right {
+    text-align: right;
+}
+
+.side-block {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.compact {
+    flex: 0 0 auto;
+    padding: 0 1rem;
+}
+
+.score-row-medium {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.75rem;
+    font-weight: 800;
+}
+
+.detail-status-small {
+    font-size: 0.7rem;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* Team Tabs for Box Score */
+.team-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    justify-content: center;
+}
+
+.team-tab-btn {
+    padding: 0.75rem 2rem;
+    border-radius: 12px;
+    background: var(--bg-accent);
+    color: var(--text-secondary);
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: var(--transition);
+    border: 1px solid var(--glass-border);
+}
+
+.team-tab-btn.active {
+    background: var(--accent-color);
+    color: white;
+    box-shadow: 0 4px 15px var(--accent-glow);
+}
+
+.mobile-hide {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .mobile-hide {
+        display: none;
+    }
+    
+    .mobile-only {
+        display: flex !important;
+    }
+    
+    /* Global Bottom Padding to prevent nav overlap */
+    .main-content {
+        padding-bottom: 120px !important;
+    }
+}
+
+.mobile-only {
+    display: none;
+}
+
+/* Ensure more stats are visible in Box Score */
+@media (max-width: 768px) {
+    .boxscore-table th:nth-child(n+3),
+    .boxscore-table td:nth-child(n+3) {
+        display: table-cell !important; /* Force show stats */
+    }
+}

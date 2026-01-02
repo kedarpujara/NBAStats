@@ -8,6 +8,7 @@ const GameDetail = ({ eventId, onBack }) => {
     const [summary, setSummary] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selectedPlayerId, setSelectedPlayerId] = useState(null);
+    const [activeTeamTab, setActiveTeamTab] = useState('away'); // 'away' or 'home'
 
     useEffect(() => {
         const fetchDetail = async () => {
@@ -39,6 +40,10 @@ const GameDetail = ({ eventId, onBack }) => {
     const homeTeam = competition.competitors.find(c => c.homeAway === 'home');
     const awayTeam = competition.competitors.find(c => c.homeAway === 'away');
 
+    // Robust logo resolution
+    const getLogo = (team) => team.logo || team.logos?.[0]?.href || 'https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/nba.png';
+    const getTeamName = (team) => team.displayName || team.name || 'Team';
+
     // Find full team box scores
     const awayBox = boxscore?.players?.find(p => p.team.id === awayTeam.team.id);
     const homeBox = boxscore?.players?.find(p => p.team.id === homeTeam.team.id);
@@ -50,26 +55,30 @@ const GameDetail = ({ eventId, onBack }) => {
             </button>
 
             <div className="game-header-large glass-card">
-                <div className="detail-teams">
-                    <div className="detail-team-block">
-                        <img src={awayTeam.team.logo} alt="" className="large-logo" />
-                        <span className="detail-team-name">{awayTeam.team.displayName}</span>
-                        <span className="detail-team-record">{awayTeam.record?.[0]?.displayValue || '0-0'}</span>
-                    </div>
-
-                    <div className="detail-score-block">
-                        <div className="score-row">
-                            <span className={`detail-score ${awayTeam.winner ? 'winner' : ''}`}>{awayTeam.score}</span>
-                            <span className="score-divider">-</span>
-                            <span className={`detail-score ${homeTeam.winner ? 'winner' : ''}`}>{homeTeam.score}</span>
+                <div className="detail-teams horizontal-teams">
+                    <div className="detail-team-block side-block">
+                        <img src={getLogo(awayTeam.team)} alt="" className="medium-logo" />
+                        <div className="team-text-meta">
+                            <span className="detail-team-name">{getTeamName(awayTeam.team)}</span>
+                            <span className="detail-team-record">{awayTeam.record?.[0]?.displayValue || '0-0'}</span>
                         </div>
-                        <span className="detail-status">{header.competitions[0].status.type.detail}</span>
                     </div>
 
-                    <div className="detail-team-block">
-                        <img src={homeTeam.team.logo} alt="" className="large-logo" />
-                        <span className="detail-team-name">{homeTeam.team.displayName}</span>
-                        <span className="detail-team-record">{homeTeam.record?.[0]?.displayValue || '0-0'}</span>
+                    <div className="detail-score-block compact">
+                        <div className="score-row-medium">
+                            <span className={`detail-score-m ${awayTeam.winner ? 'winner' : ''}`}>{awayTeam.score}</span>
+                            <span className="score-divider-m">-</span>
+                            <span className={`detail-score-m ${homeTeam.winner ? 'winner' : ''}`}>{homeTeam.score}</span>
+                        </div>
+                        <span className="detail-status-small">{header.competitions[0].status.type.detail}</span>
+                    </div>
+
+                    <div className="detail-team-block side-block text-right">
+                        <div className="team-text-meta align-right">
+                            <span className="detail-team-name">{getTeamName(homeTeam.team)}</span>
+                            <span className="detail-team-record">{homeTeam.record?.[0]?.displayValue || '0-0'}</span>
+                        </div>
+                        <img src={getLogo(homeTeam.team)} alt="" className="medium-logo" />
                     </div>
                 </div>
 
@@ -99,23 +108,43 @@ const GameDetail = ({ eventId, onBack }) => {
                 </div>
             </div>
 
+            {/* Team Switcher Tabs (Mobile Only) */}
+            <div className="team-tabs mobile-only">
+                <button
+                    className={`team-tab-btn ${activeTeamTab === 'away' ? 'active' : ''}`}
+                    onClick={() => setActiveTeamTab('away')}
+                >
+                    {awayTeam.team.abbreviation}
+                </button>
+                <button
+                    className={`team-tab-btn ${activeTeamTab === 'home' ? 'active' : ''}`}
+                    onClick={() => setActiveTeamTab('home')}
+                >
+                    {homeTeam.team.abbreviation}
+                </button>
+            </div>
+
             {/* Box Scores */}
             <div className="boxscores-container">
-                {awayBox && (
-                    <BoxScore
-                        players={awayBox.statistics[0].athletes}
-                        teamInfo={awayBox.team}
-                        onPlayerClick={setSelectedPlayerId}
-                    />
-                )}
-                <div className="spacer-v"></div>
-                {homeBox && (
-                    <BoxScore
-                        players={homeBox.statistics[0].athletes}
-                        teamInfo={homeBox.team}
-                        onPlayerClick={setSelectedPlayerId}
-                    />
-                )}
+                <div className={activeTeamTab === 'away' ? 'tab-content active' : 'tab-content mobile-hide'}>
+                    {awayBox && (
+                        <BoxScore
+                            players={awayBox.statistics[0].athletes}
+                            teamInfo={awayBox.team}
+                            onPlayerClick={setSelectedPlayerId}
+                        />
+                    )}
+                </div>
+
+                <div className={activeTeamTab === 'home' ? 'tab-content active' : 'tab-content mobile-hide'}>
+                    {homeBox && (
+                        <BoxScore
+                            players={homeBox.statistics[0].athletes}
+                            teamInfo={homeBox.team}
+                            onPlayerClick={setSelectedPlayerId}
+                        />
+                    )}
+                </div>
             </div>
 
             {/* Game Info */}
