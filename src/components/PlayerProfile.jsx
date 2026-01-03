@@ -152,11 +152,11 @@ const PlayerProfile = ({ playerId, onBack }) => {
                         <Clock size={20} />
                         <h2>Recent Game Log</h2>
                     </div>
-                    <div className="table-wrapper glass-card">
+                    <div className="stats-table-scroll-wrapper">
                         <table className="stats-table">
                             <thead>
                                 <tr>
-                                    <th>Date</th>
+                                    <th className="sticky-col">Date</th>
                                     <th>OPP</th>
                                     <th>Result</th>
                                     {gameLog?.labels?.map(l => <th key={l}>{l}</th>)}
@@ -165,7 +165,7 @@ const PlayerProfile = ({ playerId, onBack }) => {
                             <tbody>
                                 {gameLog?.entries?.map((entry, idx) => (
                                     <tr key={idx}>
-                                        <td className="date-cell">{new Date(entry.game.date).toLocaleDateString([], { month: 'short', day: 'numeric' })}</td>
+                                        <td className="sticky-col date-cell">{new Date(entry.game.date).toLocaleDateString([], { month: 'short', day: 'numeric' })}</td>
                                         <td>{entry.opponent.abbreviation}</td>
                                         <td className={entry.gameResult === 'W' ? 'win' : 'loss'}>{entry.gameResult} {entry.score}</td>
                                         {entry.stats.map((val, i) => (
