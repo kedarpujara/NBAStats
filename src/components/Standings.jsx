@@ -27,7 +27,13 @@ const Standings = () => {
     }
 
     const conference = standings?.children?.find(c => c.abbreviation === activeConf);
-    const entries = [...(conference?.standings?.entries || [])].reverse();
+    const rawEntries = conference?.standings?.entries || [];
+    // Sort by playoffSeed (ascending) so best team appears first
+    const entries = [...rawEntries].sort((a, b) => {
+        const seedA = a.stats?.find(s => s.name === 'playoffSeed')?.value ?? 999;
+        const seedB = b.stats?.find(s => s.name === 'playoffSeed')?.value ?? 999;
+        return seedA - seedB;
+    });
 
     return (
         <div className="standings-view">

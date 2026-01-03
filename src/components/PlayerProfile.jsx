@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { getPlayerDetails, getPlayerStats, getPlayerGameLog } from '../services/espnApi';
+import { getPlayerDetails, getPlayerStats, getPlayerGameLog, extractNumericalId } from '../services/espnApi';
 import { Loader2, ArrowLeft, Calendar, BarChart3, Clock } from 'lucide-react';
+
+// Convert team slug (e.g., "los-angeles-lakers") to readable name ("Los Angeles Lakers")
+const formatTeamName = (teamSlug) => {
+    if (!teamSlug) return 'N/A';
+    return teamSlug
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+};
 
 const PlayerProfile = ({ playerId, onBack }) => {
     const [details, setDetails] = useState(null);
@@ -10,11 +19,14 @@ const PlayerProfile = ({ playerId, onBack }) => {
 
     useEffect(() => {
         const fetchAll = async () => {
+            const cleanId = extractNumericalId(playerId);
+            if (!cleanId) return;
+
             setLoading(true);
             const [d, s, g] = await Promise.all([
-                getPlayerDetails(playerId),
-                getPlayerStats(playerId),
-                getPlayerGameLog(playerId)
+                getPlayerDetails(cleanId),
+                getPlayerStats(cleanId),
+                getPlayerGameLog(cleanId)
             ]);
             setDetails(d?.athlete);
             setStats(s);
@@ -78,36 +90,60 @@ const PlayerProfile = ({ playerId, onBack }) => {
             </div>
 
             <div className="profile-content">
+                {/* Current Season Stats Cards */}
+                {details.statistics && details.statistics.length > 0 && (
+                    <section className="profile-section">
+                        <div className="section-title">
+                            <BarChart3 size={20} />
+                            <h2>Current Season Averages</h2>
+                        </div>
+                        <div className="stats-grid">
+                            {details.statistics.slice(0, 8).map((stat, idx) => (
+                                <div key={idx} className="stat-card glass-card">
+                                    <span className="stat-value">{stat.displayValue || stat.value || '-'}</span>
+                                    <span className="stat-label">{stat.displayName || stat.name}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                )}
+
                 {/* Career Stats Table */}
                 <section className="profile-section">
                     <div className="section-title">
                         <BarChart3 size={20} />
-                        <h2>Season Statistics</h2>
+                        <h2>Season-by-Season Statistics</h2>
                     </div>
-                    <div className="table-wrapper glass-card">
-                        <table className="stats-table">
-                            <thead>
-                                <tr>
-                                    <th>Season</th>
-                                    <th>Team</th>
-                                    {stats?.categories?.[0]?.labels?.map(l => <th key={l}>{l}</th>)}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {stats?.categories?.[0]?.statistics?.slice().reverse().map((s, idx) => (
-                                    <tr key={idx}>
-                                        <td>{s.season.displayName}</td>
-                                        <td>{s.teamAbbreviation || s.teamSlug || 'N/A'}</td>
-                                        {s.stats.map((val, i) => (
-                                            <td key={i} className={stats.categories[0].labels[i] === 'PTS' ? 'highlight-pts' : ''}>
-                                                {val}
-                                            </td>
-                                        ))}
+                    {stats?.categories?.[0]?.statistics && stats.categories[0].statistics.length > 0 ? (
+                        <div className="stats-table-scroll-wrapper">
+                            <table className="stats-table">
+                                <thead>
+                                    <tr>
+                                        <th className="sticky-col">Season</th>
+                                        <th>Team</th>
+                                        {stats?.categories?.[0]?.labels?.map(l => <th key={l}>{l}</th>)}
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                    {stats?.categories?.[0]?.statistics?.slice().reverse().map((s, idx) => (
+                                        <tr key={idx}>
+                                            <td className="sticky-col">{s.season.displayName}</td>
+                                            <td>{s.teamDisplayName || s.teamAbbreviation || formatTeamName(s.teamSlug)}</td>
+                                            {s.stats.map((val, i) => (
+                                                <td key={i} className={stats.categories[0].labels[i] === 'PTS' ? 'highlight-pts' : ''}>
+                                                    {val}
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                            No season-by-season data available for this player.
+                        </div>
+                    )}
                 </section>
 
                 {/* Recent Game Log */}

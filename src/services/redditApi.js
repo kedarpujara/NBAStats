@@ -1,7 +1,9 @@
 export const getNbaRedditFeed = async () => {
     try {
-        // Using Reddit's native JSON endpoint is much richer and doesn't rely on RSS-to-JSON conversion
-        const response = await fetch('https://www.reddit.com/r/nba/hot.json?limit=25');
+        // Reddit blocks browser CORS requests - use a proxy
+        const REDDIT_URL = 'https://www.reddit.com/r/nba/hot.json?limit=25';
+        const CORS_PROXY = 'https://corsproxy.io/?';
+        const response = await fetch(CORS_PROXY + encodeURIComponent(REDDIT_URL));
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
 

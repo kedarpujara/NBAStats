@@ -166,3 +166,19 @@ export const getNbaNews = async () => {
         return null;
     }
 };
+
+export const getStatLeaders = async () => {
+    const cached = cacheService.get('stat_leaders');
+    if (cached) return cached;
+
+    try {
+        const response = await fetch('https://site.api.espn.com/apis/site/v3/sports/basketball/nba/leaders');
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        cacheService.set('stat_leaders', data, 60);
+        return data;
+    } catch (error) {
+        console.error('Error fetching stat leaders:', error);
+        return null;
+    }
+};

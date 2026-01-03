@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getScoreboard } from '../services/espnApi';
 import GameCard from './GameCard';
-import { Loader2, Calendar } from 'lucide-react';
+import { Loader2, Calendar, Tv } from 'lucide-react';
 import GameDetail from './GameDetail';
 
 const GamesView = () => {
@@ -42,9 +42,19 @@ const GamesView = () => {
             <div className="view-header">
                 <div className="header-top">
                     <h1>Nightly Games</h1>
-                    <button className="refresh-btn" onClick={() => fetchGames(true)}>
-                        Refresh
-                    </button>
+                    <div className="header-actions">
+                        <a
+                            href="https://nba.footybite.to/nba-now"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="watch-btn"
+                        >
+                            <Tv size={16} /> Watch Now
+                        </a>
+                        <button className="refresh-btn" onClick={() => fetchGames(true)}>
+                            Refresh
+                        </button>
+                    </div>
                 </div>
                 <p>Live scores, schedules, and detailed box scores for every matchup.</p>
             </div>

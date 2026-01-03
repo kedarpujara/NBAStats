@@ -50,9 +50,6 @@ const RedditFeed = () => {
                         </div>
 
                         <div className="post-content">
-                            {post.thumbnail && post.thumbnail.startsWith('http') && (
-                                <img src={post.thumbnail} alt="" className="post-thumbnail" />
-                            )}
                             <h3 className="post-title">{post.title}</h3>
                         </div>
 
