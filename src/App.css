@@ -2788,3 +2788,313 @@
     font-size: 0.55rem;
   }
 }
+
+/* =====================================================
+   SWIPE GESTURE & PLAY-BY-PLAY STYLES
+   ===================================================== */
+
+/* Game Detail Header Row - Back + Play-by-Play buttons */
+.game-detail-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+/* Play-by-Play Button */
+.pbp-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.pbp-btn:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.pbp-btn:active {
+  transform: translateY(0);
+}
+
+/* Swipe Back Indicator */
+.swipe-back-indicator {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  background: var(--accent-color);
+  border-radius: 0 50% 50% 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  z-index: 1000;
+  pointer-events: none;
+  box-shadow: 0 4px 15px var(--accent-glow);
+}
+
+/* Game Detail Transitioning State */
+.game-detail-v2.transitioning {
+  opacity: 0.8;
+}
+
+/* =====================================================
+   PLAY-BY-PLAY COMPONENT
+   ===================================================== */
+
+.play-by-play {
+  animation: fadeIn 0.3s ease-out;
+  padding: 0 1rem;
+}
+
+.pbp-header {
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.pbp-header h2 {
+  font-size: 1.25rem;
+  margin: 0 0 0.75rem 0;
+}
+
+.pbp-teams {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.pbp-team {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.pbp-team img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.pbp-vs {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* Period Sections */
+.pbp-periods {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pbp-period-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  width: 100%;
+  cursor: pointer;
+  font-weight: 600;
+  border: none;
+  text-align: left;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: var(--transition);
+}
+
+.pbp-period-header:hover {
+  background: var(--bg-accent);
+}
+
+.pbp-play-count {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-left: auto;
+  margin-right: 0.75rem;
+}
+
+/* Plays List */
+.pbp-plays {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--glass-border);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
+  background: var(--bg-secondary);
+}
+
+.pbp-play {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--glass-border);
+  font-size: 0.85rem;
+  transition: background 0.2s ease;
+}
+
+.pbp-play:last-child {
+  border-bottom: none;
+}
+
+.pbp-play-time {
+  flex-shrink: 0;
+  width: 45px;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.pbp-play-content {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: baseline;
+}
+
+.pbp-play-team {
+  font-weight: 700;
+  color: var(--accent-color);
+  font-size: 0.75rem;
+}
+
+.pbp-play-text {
+  color: var(--text-primary);
+}
+
+.pbp-score {
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-left: auto;
+  font-size: 0.8rem;
+  background: var(--bg-accent);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+}
+
+/* Play Type Styling */
+.pbp-play.play-score {
+  background: rgba(76, 175, 80, 0.08);
+}
+
+.pbp-play.play-three {
+  background: rgba(255, 193, 7, 0.08);
+}
+
+.pbp-play.play-dunk {
+  background: rgba(156, 39, 176, 0.08);
+}
+
+.pbp-play.play-block,
+.pbp-play.play-steal {
+  background: rgba(33, 150, 243, 0.08);
+}
+
+.pbp-play.play-turnover,
+.pbp-play.play-foul {
+  background: rgba(244, 67, 54, 0.05);
+}
+
+/* Team-specific play colors */
+.pbp-play.home-play {
+  border-left: 3px solid var(--accent-color);
+}
+
+.pbp-play.away-play {
+  border-left: 3px solid var(--text-muted);
+}
+
+/* Mobile Styles for Play-by-Play */
+@media (max-width: 480px) {
+  .game-detail-header-row {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .game-detail-header-row .back-btn {
+    flex: 1;
+  }
+
+  .pbp-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .play-by-play {
+    padding: 0 0.75rem;
+  }
+
+  .pbp-header {
+    padding: 1rem;
+  }
+
+  .pbp-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .pbp-team img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .pbp-period-header {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .pbp-play {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .pbp-play-time {
+    width: 40px;
+    font-size: 0.7rem;
+  }
+
+  .pbp-play-team {
+    font-size: 0.7rem;
+  }
+
+  .pbp-score {
+    font-size: 0.75rem;
+    padding: 0.1rem 0.4rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .pbp-btn {
+    font-size: 0.7rem;
+    padding: 0.45rem 0.5rem;
+  }
+
+  .pbp-play {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  .pbp-play-time {
+    width: 35px;
+    font-size: 0.65rem;
+  }
+}

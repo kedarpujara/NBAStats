@@ -182,3 +182,22 @@ export const getStatLeaders = async () => {
         return null;
     }
 };
+
+export const getPlayByPlay = async (eventId) => {
+    const cacheKey = `play_by_play_${eventId}`;
+    const cached = cacheService.get(cacheKey);
+    if (cached) return cached;
+
+    try {
+        const response = await fetch(`${BASE_URL}/playbyplay?event=${eventId}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        // Cache for longer if game is finished
+        const ttl = data.header?.competitions?.[0]?.status?.type?.state === 'post' ? 1440 : 1;
+        cacheService.set(cacheKey, data, ttl);
+        return data;
+    } catch (error) {
+        console.error('Error fetching play by play:', error);
+        return null;
+    }
+};

@@ -1,14 +1,65 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { getGameSummary } from '../services/espnApi';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowLeft, ListOrdered } from 'lucide-react';
 import BoxScore from './BoxScore';
 import PlayerProfile from './PlayerProfile';
+import PlayByPlay from './PlayByPlay';
 
 const GameDetail = ({ eventId, onBack }) => {
     const [summary, setSummary] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selectedPlayerId, setSelectedPlayerId] = useState(null);
     const [activeTeamTab, setActiveTeamTab] = useState('away');
+    const [showPlayByPlay, setShowPlayByPlay] = useState(false);
+    const [swipeOffset, setSwipeOffset] = useState(0);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+
+    // Swipe gesture refs
+    const containerRef = useRef(null);
+    const touchStartX = useRef(0);
+    const touchStartY = useRef(0);
+    const isSwiping = useRef(false);
+
+    // Swipe gesture handlers
+    const handleTouchStart = useCallback((e) => {
+        // Only start swipe if touch begins near the left edge (within 40px) or anywhere
+        touchStartX.current = e.touches[0].clientX;
+        touchStartY.current = e.touches[0].clientY;
+        isSwiping.current = false;
+    }, []);
+
+    const handleTouchMove = useCallback((e) => {
+        const deltaX = e.touches[0].clientX - touchStartX.current;
+        const deltaY = e.touches[0].clientY - touchStartY.current;
+
+        // Determine if this is a horizontal swipe (more horizontal than vertical)
+        if (!isSwiping.current && Math.abs(deltaX) > 10) {
+            isSwiping.current = Math.abs(deltaX) > Math.abs(deltaY);
+        }
+
+        // Only track horizontal swipes going right (positive deltaX)
+        if (isSwiping.current && deltaX > 0) {
+            // Add resistance as you swipe further
+            const resistance = 0.4;
+            const offset = Math.min(deltaX * resistance, 150);
+            setSwipeOffset(offset);
+        }
+    }, []);
+
+    const handleTouchEnd = useCallback(() => {
+        if (swipeOffset > 80) {
+            // Trigger back navigation with animation
+            setIsTransitioning(true);
+            setSwipeOffset(window.innerWidth);
+            setTimeout(() => {
+                onBack();
+            }, 200);
+        } else {
+            // Snap back
+            setSwipeOffset(0);
+        }
+        isSwiping.current = false;
+    }, [swipeOffset, onBack]);
 
     useEffect(() => {
         const fetchDetail = async () => {
@@ -46,6 +97,26 @@ const GameDetail = ({ eventId, onBack }) => {
     const awayBox = boxscore?.players?.find(p => p.team.id === awayTeam.team.id);
     const homeBox = boxscore?.players?.find(p => p.team.id === homeTeam.team.id);
 
+    // Show Play-by-Play view
+    if (showPlayByPlay) {
+        return (
+            <PlayByPlay
+                eventId={eventId}
+                onBack={() => setShowPlayByPlay(false)}
+                awayTeam={{
+                    id: awayTeam.team.id,
+                    abbreviation: awayTeam.team.abbreviation,
+                    logo: getLogo(awayTeam.team)
+                }}
+                homeTeam={{
+                    id: homeTeam.team.id,
+                    abbreviation: homeTeam.team.abbreviation,
+                    logo: getLogo(homeTeam.team)
+                }}
+            />
+        );
+    }
+
     // Reusable team row component with CONSISTENT ordering: Badge → Logo → Name → Record
     const TeamRow = ({ team, type }) => (
         <div className="team-row-v2">
@@ -59,11 +130,39 @@ const GameDetail = ({ eventId, onBack }) => {
         </div>
     );
 
+    // Swipe indicator opacity based on offset
+    const swipeIndicatorOpacity = Math.min(swipeOffset / 60, 1);
+
     return (
-        <div className="game-detail-v2">
-            <button className="back-btn" onClick={onBack}>
-                <ArrowLeft size={18} /> Back to Games
-            </button>
+        <div
+            className={`game-detail-v2 ${isTransitioning ? 'transitioning' : ''}`}
+            ref={containerRef}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            style={{
+                transform: `translateX(${swipeOffset}px)`,
+                transition: swipeOffset === 0 || isTransitioning ? 'transform 0.2s ease-out' : 'none'
+            }}
+        >
+            {/* Swipe back indicator */}
+            {swipeOffset > 0 && (
+                <div
+                    className="swipe-back-indicator"
+                    style={{ opacity: swipeIndicatorOpacity }}
+                >
+                    <ArrowLeft size={24} />
+                </div>
+            )}
+
+            <div className="game-detail-header-row">
+                <button className="back-btn" onClick={onBack}>
+                    <ArrowLeft size={18} /> Back to Games
+                </button>
+                <button className="pbp-btn" onClick={() => setShowPlayByPlay(true)}>
+                    <ListOrdered size={18} /> Play-by-Play
+                </button>
+            </div>
 
             {/* Game Header - Stacked for mobile */}
             <div className="game-header-v2 glass-card">
