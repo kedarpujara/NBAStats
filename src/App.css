@@ -1371,6 +1371,21 @@
   font-size: 0.9rem;
 }
 
+/* Career Totals Row - highlighted */
+.career-totals-row {
+  background: rgba(59, 130, 246, 0.1);
+  border-top: 2px solid var(--accent-color);
+  border-bottom: 2px solid var(--accent-color);
+}
+
+.career-totals-row td {
+  color: var(--text-primary);
+}
+
+.career-totals-row .sticky-col {
+  background: rgba(59, 130, 246, 0.15);
+}
+
 .highlight-pts {
   font-weight: 800;
   color: var(--text-primary);

@@ -125,8 +125,52 @@ export const getPlayerGameLog = async (playerId) => {
         const response = await fetch(`https://site.web.api.espn.com/apis/common/v3/sports/basketball/nba/athletes/${playerId}/gamelog`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
-        cacheService.set(cacheKey, data, 60);
-        return data;
+
+        // Parse the complex gamelog structure into a simpler format
+        const labels = data.labels || [];
+        const eventsMap = data.events || {};
+
+        // Get stats from seasonTypes -> categories -> events
+        const entries = [];
+        const seasonTypes = data.seasonTypes || [];
+
+        for (const seasonType of seasonTypes) {
+            const categories = seasonType.categories || [];
+            for (const category of categories) {
+                const categoryEvents = category.events || [];
+                for (const evt of categoryEvents) {
+                    const eventId = evt.eventId;
+                    const eventInfo = eventsMap[eventId];
+                    if (eventInfo && evt.stats) {
+                        entries.push({
+                            game: {
+                                id: eventId,
+                                date: eventInfo.gameDate
+                            },
+                            opponent: eventInfo.opponent || {},
+                            gameResult: eventInfo.gameResult,
+                            score: eventInfo.score,
+                            stats: evt.stats
+                        });
+                    }
+                }
+            }
+        }
+
+        // Extract career totals from the first seasonType's category totals
+        let careerTotals = null;
+        if (seasonTypes.length > 0 && seasonTypes[0].categories?.length > 0) {
+            careerTotals = seasonTypes[0].categories[0].totals;
+        }
+
+        const normalizedData = {
+            labels,
+            entries,
+            careerTotals
+        };
+
+        cacheService.set(cacheKey, normalizedData, 60);
+        return normalizedData;
     } catch (error) {
         console.error('Error fetching player gamelog:', error);
         return null;

@@ -12,7 +12,7 @@ const formatTeamName = (teamSlug) => {
 };
 
 // Preferred column order - important stats first
-const PREFERRED_STATS_ORDER = ['PTS', 'REB', 'AST', 'STL', 'BLK', 'FG%', '3P%', 'FT%', '3PT', 'FT', 'FG', 'GP', 'GS', 'MIN', 'OR', 'DR', 'PF', 'TO'];
+const PREFERRED_STATS_ORDER = ['PTS', 'REB', 'AST', 'STL', 'BLK', 'FG', 'FG%', '3PT', '3P%', 'FT', 'FT%', 'GP', 'GS', 'MIN', 'OR', 'DR', 'PF', 'TO'];
 
 // Reorder labels and stats to put important ones first
 const reorderStats = (labels, stats) => {
@@ -97,7 +97,7 @@ const PlayerProfile = ({ playerId, onBack }) => {
     };
 
     return (
-        <div className="player-profile">
+        <div className="player-profile" style={{ padding: '0 1.25rem' }}>
             <button className="back-btn" onClick={onBack}>
                 <ArrowLeft size={18} /> Back
             </button>
@@ -153,7 +153,9 @@ const PlayerProfile = ({ playerId, onBack }) => {
                     {stats?.categories?.[0]?.statistics && stats.categories[0].statistics.length > 0 ? (
                         (() => {
                             const originalLabels = stats.categories[0].labels || [];
+                            const careerTotals = stats.categories[0].totals || [];
                             const { labels: orderedLabels } = reorderStats(originalLabels, originalLabels);
+                            const { stats: orderedCareerTotals } = reorderStats(originalLabels, careerTotals);
                             return (
                                 <div className="stats-table-scroll-wrapper">
                                     <table className="stats-table">
@@ -165,6 +167,18 @@ const PlayerProfile = ({ playerId, onBack }) => {
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            {/* Career Totals Row */}
+                                            {careerTotals.length > 0 && (
+                                                <tr className="career-totals-row">
+                                                    <td className="sticky-col"><strong>Career</strong></td>
+                                                    <td>-</td>
+                                                    {orderedCareerTotals.map((val, i) => (
+                                                        <td key={i} className={orderedLabels[i] === 'PTS' ? 'highlight-pts' : ''}>
+                                                            <strong>{val}</strong>
+                                                        </td>
+                                                    ))}
+                                                </tr>
+                                            )}
                                             {stats?.categories?.[0]?.statistics?.slice().reverse().map((s, idx) => {
                                                 const { labels: reorderedLabels, stats: reorderedStats } = reorderStats(originalLabels, s.stats);
                                                 return (

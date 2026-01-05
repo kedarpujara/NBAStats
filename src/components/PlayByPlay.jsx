@@ -130,6 +130,7 @@ const PlayByPlay = ({ eventId, onBack, awayTeam, homeTeam }) => {
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
+            style={{ padding: '0 1.25rem' }}
         >
             <button className="back-btn" onClick={onBack}>
                 <ArrowLeft size={18} /> Back to Game
