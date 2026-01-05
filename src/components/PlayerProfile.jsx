@@ -11,6 +11,42 @@ const formatTeamName = (teamSlug) => {
         .join(' ');
 };
 
+// Preferred column order - important stats first
+const PREFERRED_STATS_ORDER = ['PTS', 'REB', 'AST', 'STL', 'BLK', 'FG%', '3P%', 'FT%', '3PT', 'FT', 'FG', 'GP', 'GS', 'MIN', 'OR', 'DR', 'PF', 'TO'];
+
+// Reorder labels and stats to put important ones first
+const reorderStats = (labels, stats) => {
+    if (!labels || !stats) return { labels: [], stats: [] };
+
+    const labelIndexMap = {};
+    labels.forEach((label, idx) => {
+        labelIndexMap[label] = idx;
+    });
+
+    const orderedLabels = [];
+    const orderedIndices = [];
+
+    // First add preferred stats in order
+    PREFERRED_STATS_ORDER.forEach(pref => {
+        if (labelIndexMap[pref] !== undefined) {
+            orderedLabels.push(pref);
+            orderedIndices.push(labelIndexMap[pref]);
+        }
+    });
+
+    // Then add any remaining stats not in preferred order
+    labels.forEach((label, idx) => {
+        if (!PREFERRED_STATS_ORDER.includes(label)) {
+            orderedLabels.push(label);
+            orderedIndices.push(idx);
+        }
+    });
+
+    const orderedStats = orderedIndices.map(idx => stats[idx]);
+
+    return { labels: orderedLabels, stats: orderedStats };
+};
+
 const PlayerProfile = ({ playerId, onBack }) => {
     const [details, setDetails] = useState(null);
     const [stats, setStats] = useState(null);
@@ -115,30 +151,39 @@ const PlayerProfile = ({ playerId, onBack }) => {
                         <h2>Season-by-Season Statistics</h2>
                     </div>
                     {stats?.categories?.[0]?.statistics && stats.categories[0].statistics.length > 0 ? (
-                        <div className="stats-table-scroll-wrapper">
-                            <table className="stats-table">
-                                <thead>
-                                    <tr>
-                                        <th className="sticky-col">Season</th>
-                                        <th>Team</th>
-                                        {stats?.categories?.[0]?.labels?.map(l => <th key={l}>{l}</th>)}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {stats?.categories?.[0]?.statistics?.slice().reverse().map((s, idx) => (
-                                        <tr key={idx}>
-                                            <td className="sticky-col">{s.season.displayName}</td>
-                                            <td>{s.teamDisplayName || s.teamAbbreviation || formatTeamName(s.teamSlug)}</td>
-                                            {s.stats.map((val, i) => (
-                                                <td key={i} className={stats.categories[0].labels[i] === 'PTS' ? 'highlight-pts' : ''}>
-                                                    {val}
-                                                </td>
-                                            ))}
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                        (() => {
+                            const originalLabels = stats.categories[0].labels || [];
+                            const { labels: orderedLabels } = reorderStats(originalLabels, originalLabels);
+                            return (
+                                <div className="stats-table-scroll-wrapper">
+                                    <table className="stats-table">
+                                        <thead>
+                                            <tr>
+                                                <th className="sticky-col">Season</th>
+                                                <th>Team</th>
+                                                {orderedLabels.map(l => <th key={l}>{l}</th>)}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {stats?.categories?.[0]?.statistics?.slice().reverse().map((s, idx) => {
+                                                const { labels: reorderedLabels, stats: reorderedStats } = reorderStats(originalLabels, s.stats);
+                                                return (
+                                                    <tr key={idx}>
+                                                        <td className="sticky-col">{s.season.displayName}</td>
+                                                        <td>{s.teamDisplayName || s.teamAbbreviation || formatTeamName(s.teamSlug)}</td>
+                                                        {reorderedStats.map((val, i) => (
+                                                            <td key={i} className={reorderedLabels[i] === 'PTS' ? 'highlight-pts' : ''}>
+                                                                {val}
+                                                            </td>
+                                                        ))}
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            );
+                        })()
                     ) : (
                         <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                             No season-by-season data available for this player.
@@ -152,33 +197,42 @@ const PlayerProfile = ({ playerId, onBack }) => {
                         <Clock size={20} />
                         <h2>Recent Game Log</h2>
                     </div>
-                    <div className="stats-table-scroll-wrapper">
-                        <table className="stats-table">
-                            <thead>
-                                <tr>
-                                    <th className="sticky-col">Date</th>
-                                    <th>OPP</th>
-                                    <th>Result</th>
-                                    {gameLog?.labels?.map(l => <th key={l}>{l}</th>)}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {gameLog?.entries?.map((entry, idx) => (
-                                    <tr key={idx}>
-                                        <td className="sticky-col date-cell">{new Date(entry.game.date).toLocaleDateString([], { month: 'short', day: 'numeric' })}</td>
-                                        <td>{entry.opponent.abbreviation}</td>
-                                        <td className={entry.gameResult === 'W' ? 'win' : 'loss'}>{entry.gameResult} {entry.score}</td>
-                                        {entry.stats.map((val, i) => (
-                                            <td key={i}>{val}</td>
-                                        ))}
-                                    </tr>
-                                ))}
-                                {(!gameLog?.entries || gameLog.entries.length === 0) && (
-                                    <tr><td colSpan="20" className="empty-msg">No recent games found.</td></tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                    {(() => {
+                        const originalLabels = gameLog?.labels || [];
+                        const { labels: orderedLabels } = reorderStats(originalLabels, originalLabels);
+                        return (
+                            <div className="stats-table-scroll-wrapper">
+                                <table className="stats-table">
+                                    <thead>
+                                        <tr>
+                                            <th className="sticky-col">Date</th>
+                                            <th>OPP</th>
+                                            <th>Result</th>
+                                            {orderedLabels.map(l => <th key={l}>{l}</th>)}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {gameLog?.entries?.map((entry, idx) => {
+                                            const { stats: reorderedStats } = reorderStats(originalLabels, entry.stats);
+                                            return (
+                                                <tr key={idx}>
+                                                    <td className="sticky-col date-cell">{new Date(entry.game.date).toLocaleDateString([], { month: 'short', day: 'numeric' })}</td>
+                                                    <td>{entry.opponent.abbreviation}</td>
+                                                    <td className={entry.gameResult === 'W' ? 'win' : 'loss'}>{entry.gameResult} {entry.score}</td>
+                                                    {reorderedStats.map((val, i) => (
+                                                        <td key={i}>{val}</td>
+                                                    ))}
+                                                </tr>
+                                            );
+                                        })}
+                                        {(!gameLog?.entries || gameLog.entries.length === 0) && (
+                                            <tr><td colSpan="20" className="empty-msg">No recent games found.</td></tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        );
+                    })()}
                 </section>
             </div>
         </div>
