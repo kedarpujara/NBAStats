@@ -142,8 +142,7 @@ const GameDetail = ({ eventId, onBack }) => {
             onTouchEnd={handleTouchEnd}
             style={{
                 transform: `translateX(${swipeOffset}px)`,
-                transition: swipeOffset === 0 || isTransitioning ? 'transform 0.2s ease-out' : 'none',
-                padding: '0 1.25rem'
+                transition: swipeOffset === 0 || isTransitioning ? 'transform 0.2s ease-out' : 'none'
             }}
         >
             {/* Swipe back indicator */}

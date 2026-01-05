@@ -2,6 +2,10 @@
   display: flex;
   min-height: 100vh;
   background-color: var(--bg-primary);
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .sidebar {
@@ -93,6 +97,8 @@
   margin-left: var(--sidebar-width);
   padding: 2.5rem 3.5rem;
   min-height: 100vh;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 /* Common View Styles */
@@ -311,8 +317,16 @@
     margin-left: 0;
     padding: 1rem;
     padding-bottom: 90px;
-    overflow-x: hidden;
-    max-width: 100vw;
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Ensure all children of main-content stay within bounds on mobile */
+  .main-content > * {
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .view-header h1 {
@@ -1210,6 +1224,17 @@
 /* Player Profile Expansion */
 .player-profile {
   animation: fadeIn 0.3s ease-out;
+  padding: 0 var(--mobile-padding) !important;
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure ALL children stay within bounds */
+.player-profile * {
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .profile-header-premium {
@@ -1909,6 +1934,17 @@
 
 .game-detail-v2 {
   animation: fadeIn 0.3s ease-out;
+  padding: 0 var(--mobile-padding) !important;
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure ALL children stay within bounds */
+.game-detail-v2 * {
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* Game Header - Stacked Layout */
@@ -1918,6 +1954,9 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* Team Row - Consistent ordering: Badge → Logo → Name → Record → Score */
@@ -1927,6 +1966,9 @@
   gap: 1rem;
   padding: 1rem 0;
   border-bottom: 1px solid var(--glass-border);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .team-row-v2:last-of-type {
@@ -2032,6 +2074,9 @@
   gap: 1rem;
   margin-bottom: 2rem;
   justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .team-tab-v2 {
@@ -2056,12 +2101,19 @@
 .boxscore-container-v2 {
   margin-bottom: 2.5rem;
   margin-top: 1rem;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .boxscore-v2 {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .boxscore-team-header {
@@ -2069,6 +2121,9 @@
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 1rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .boxscore-team-header h2 {
@@ -2092,6 +2147,9 @@
   color: var(--text-secondary);
   letter-spacing: 0.08em;
   border-bottom: 2px solid var(--accent-color);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* Scrollable Table Wrapper */
@@ -2099,6 +2157,9 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   background: var(--bg-secondary);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   border-radius: 0 0 var(--border-radius) var(--border-radius);
   border: 1px solid var(--glass-border);
   border-top: none;
@@ -2172,7 +2233,7 @@
 /* Mobile Game Detail Container */
 @media (max-width: 480px) {
   .game-detail-v2 {
-    padding: 0 1rem;
+    padding: 0 var(--mobile-padding) !important;
   }
 
   /* Header row with back button and pbp button */
@@ -2370,7 +2431,7 @@
 /* Very small screens (iPhone SE, etc.) */
 @media (max-width: 360px) {
   .game-detail-v2 {
-    padding: 0 0.75rem;
+    padding: 0 var(--mobile-padding) !important;
   }
 
   .game-header-v2 {
@@ -2604,7 +2665,7 @@
 @media (max-width: 768px) {
   /* Player Profile Container - GOOD PADDING on left and right */
   .player-profile {
-    padding: 0 1rem;
+    padding: 0 var(--mobile-padding) !important;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
@@ -2820,7 +2881,7 @@
 @media (max-width: 480px) {
   /* Keep good padding on smaller screens */
   .player-profile {
-    padding: 0 0.75rem;
+    padding: 0 var(--mobile-padding) !important;
   }
 
   .section-title h2 {
@@ -2906,7 +2967,7 @@
 @media (max-width: 360px) {
   /* Still maintain padding on very small screens */
   .player-profile {
-    padding: 0 0.5rem;
+    padding: 0 var(--mobile-padding) !important;
   }
 
   .section-title h2 {
@@ -3013,7 +3074,17 @@
 
 .play-by-play {
   animation: fadeIn 0.3s ease-out;
-  padding: 0 1.5rem;
+  padding: 0 var(--mobile-padding) !important;
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure ALL children stay within bounds */
+.play-by-play * {
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .pbp-header {
@@ -3201,7 +3272,7 @@
   }
 
   .play-by-play {
-    padding: 0 1rem;
+    padding: 0 var(--mobile-padding) !important;
   }
 
   .pbp-header {
@@ -3244,7 +3315,7 @@
 
 @media (max-width: 360px) {
   .play-by-play {
-    padding: 0 0.75rem;
+    padding: 0 var(--mobile-padding) !important;
   }
 
   .pbp-btn {

@@ -97,7 +97,7 @@ const PlayerProfile = ({ playerId, onBack }) => {
     };
 
     return (
-        <div className="player-profile" style={{ padding: '0 1.25rem' }}>
+        <div className="player-profile">
             <button className="back-btn" onClick={onBack}>
                 <ArrowLeft size={18} /> Back
             </button>
