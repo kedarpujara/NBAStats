@@ -189,15 +189,25 @@ export const getPlayByPlay = async (eventId) => {
     if (cached) return cached;
 
     try {
-        const response = await fetch(`${BASE_URL}/playbyplay?event=${eventId}`);
+        // Use the summary endpoint which contains plays data
+        // The dedicated playbyplay endpoint returns empty for most games
+        const response = await fetch(`${BASE_URL}/summary?event=${eventId}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
+
+        const plays = data.plays || [];
+
+        const normalizedData = {
+            ...data,
+            plays
+        };
+
         // Cache for longer if game is finished
         const ttl = data.header?.competitions?.[0]?.status?.type?.state === 'post' ? 1440 : 1;
-        cacheService.set(cacheKey, data, ttl);
-        return data;
+        cacheService.set(cacheKey, normalizedData, ttl);
+        return normalizedData;
     } catch (error) {
         console.error('Error fetching play by play:', error);
-        return null;
+        return { plays: [] };
     }
 };

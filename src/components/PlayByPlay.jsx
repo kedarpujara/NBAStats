@@ -36,8 +36,9 @@ const PlayByPlay = ({ eventId, onBack, awayTeam, homeTeam }) => {
             if (result) {
                 setData(result);
                 // Expand the most recent period by default
-                if (result.plays) {
-                    const periods = [...new Set(result.plays.map(p => p.period?.number))].filter(Boolean);
+                const plays = result.plays || [];
+                if (plays.length > 0) {
+                    const periods = [...new Set(plays.map(p => p.period?.number))].filter(Boolean);
                     if (periods.length > 0) {
                         setExpandedPeriods({ [Math.max(...periods)]: true });
                     }
@@ -163,7 +164,7 @@ const PlayByPlay = ({ eventId, onBack, awayTeam, homeTeam }) => {
 
                         {expandedPeriods[periodNum] && (
                             <div className="pbp-plays">
-                                {playsByPeriod[periodNum].map((play, idx) => {
+                                {[...playsByPeriod[periodNum]].reverse().map((play, idx) => {
                                     const teamInfo = getTeamInfo(play);
                                     return (
                                         <div
