@@ -1,6 +1,6 @@
 # NBAStats
 
-Your one-stop shop for all NBA games, stats, news, and gossip.
+## Your one-stop shop for all NBA games, stats, news, and gossip.
 
 A modern, mobile-first web app that aggregates real-time NBA data from multiple sources into a clean, unified experience. Check live scores, dive into box scores, explore player profiles, track standings, read the latest news, and see what r/nba is buzzing about — all in one place.
 
@@ -9,13 +9,30 @@ Vist now: https://nbastats-seven.vercel.app/
 ---
 
 ## Table of Contents
-- [Getting Started](#getting-started)
 - [Features](#features)
+- [Getting Started](#getting-started)
 - [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
 - [Data Sources](#data-sources)
 - [Caching Strategy](#caching-strategy)
 - [Project Structure](#project-structure)
+
+
+---
+
+## Features
+
+| Module | Description |
+|--------|-------------|
+| **Games** | Live scoreboard with date navigation, top performer stats, and auto-refresh for in-progress games |
+| **Box Scores** | Full game breakdowns with starters, bench, DNP sections, and detailed player stats |
+| **Player Profiles** | Search players, view career stats, season averages, and recent game logs |
+| **Stat Leaders** | League leaders across points, rebounds, assists, steals, blocks, and shooting percentages |
+| **Standings** | Eastern & Western Conference standings with records, streaks, and playoff positioning |
+| **News** | Latest NBA news and injury reports from ESPN |
+| **Reddit Feed** | Trending posts from r/nba to catch community buzz and discussions |
+
+---
 
 
 ---
@@ -33,21 +50,6 @@ npm run dev
 npm run build
 ```
 
----
-
-## Features
-
-| Module | Description |
-|--------|-------------|
-| **Games** | Live scoreboard with date navigation, top performer stats, and auto-refresh for in-progress games |
-| **Box Scores** | Full game breakdowns with starters, bench, DNP sections, and detailed player stats |
-| **Player Profiles** | Search players, view career stats, season averages, and recent game logs |
-| **Stat Leaders** | League leaders across points, rebounds, assists, steals, blocks, and shooting percentages |
-| **Standings** | Eastern & Western Conference standings with records, streaks, and playoff positioning |
-| **News** | Latest NBA news and injury reports from ESPN |
-| **Reddit Feed** | Trending posts from r/nba to catch community buzz and discussions |
-
----
 
 ## Tech Stack
 
