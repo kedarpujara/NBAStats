@@ -4,17 +4,34 @@ Your one-stop shop for all NBA games, stats, news, and gossip.
 
 A modern, mobile-first web app that aggregates real-time NBA data from multiple sources into a clean, unified experience. Check live scores, dive into box scores, explore player profiles, track standings, read the latest news, and see what r/nba is buzzing about — all in one place.
 
+Vist now: https://nbastats-seven.vercel.app/
+
 ---
 
 ## Table of Contents
-
+- [Getting Started](#getting-started)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
 - [Data Sources](#data-sources)
 - [Caching Strategy](#caching-strategy)
 - [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
+
+
+---
+
+## Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+```
 
 ---
 
@@ -130,20 +147,6 @@ src/
 └── styles/            # CSS modules
 ```
 
----
-
-## Getting Started
-
-```bash
-# Install dependencies
-npm install
-
-# Run development server
-npm run dev
-
-# Build for production
-npm run build
-```
 
 ---
 
