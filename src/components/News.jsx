@@ -1,22 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import { getNbaNews } from '../services/espnApi';
-import { Loader2, ExternalLink, Clock } from 'lucide-react';
+import { Loader2, ExternalLink, Clock, ChevronDown } from 'lucide-react';
+
+const INITIAL_LIMIT = 15;
+const MAX_LIMIT = 30;
 
 const News = () => {
     const [articles, setArticles] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [currentLimit, setCurrentLimit] = useState(INITIAL_LIMIT);
+    const [hasMore, setHasMore] = useState(true);
+
+    const fetchNews = async (limit) => {
+        const data = await getNbaNews(limit);
+        if (data && data.articles) {
+            setArticles(data.articles);
+            setHasMore(data.articles.length >= limit && limit < MAX_LIMIT);
+        }
+    };
 
     useEffect(() => {
-        const fetchNews = async () => {
+        const init = async () => {
             setLoading(true);
-            const data = await getNbaNews();
-            if (data && data.articles) {
-                setArticles(data.articles);
-            }
+            await fetchNews(INITIAL_LIMIT);
             setLoading(false);
         };
-        fetchNews();
+        init();
     }, []);
+
+    const loadMore = async () => {
+        setLoadingMore(true);
+        const newLimit = Math.min(currentLimit + 15, MAX_LIMIT);
+        await fetchNews(newLimit);
+        setCurrentLimit(newLimit);
+        setLoadingMore(false);
+    };
 
     const formatDate = (dateStr) => {
         return new Date(dateStr).toLocaleDateString([], { 
@@ -70,6 +89,28 @@ const News = () => {
                     </article>
                 ))}
             </div>
+
+            {hasMore && (
+                <div className="load-more-container">
+                    <button
+                        className="load-more-btn"
+                        onClick={loadMore}
+                        disabled={loadingMore}
+                    >
+                        {loadingMore ? (
+                            <>
+                                <Loader2 className="animate-spin" size={16} />
+                                Loading...
+                            </>
+                        ) : (
+                            <>
+                                <ChevronDown size={16} />
+                                Load More Articles
+                            </>
+                        )}
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

@@ -11,17 +11,34 @@ export const extractNumericalId = (uid) => {
     return parts.length > 1 ? parts[1] : uid;
 };
 
-export const getScoreboard = async (forceRefresh = false) => {
+// Format date as YYYYMMDD for ESPN API
+export const formatDateForApi = (date) => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}${month}${day}`;
+};
+
+export const getScoreboard = async (forceRefresh = false, date = null) => {
+    const dateStr = date ? formatDateForApi(date) : null;
+    const cacheKey = dateStr ? `scoreboard_${dateStr}` : 'scoreboard';
+
     if (!forceRefresh) {
-        const cached = cacheService.get('scoreboard');
+        const cached = cacheService.get(cacheKey);
         if (cached) return cached;
     }
 
     try {
-        const response = await fetch(`${BASE_URL}/scoreboard`);
+        const url = dateStr
+            ? `${BASE_URL}/scoreboard?dates=${dateStr}`
+            : `${BASE_URL}/scoreboard`;
+        const response = await fetch(url);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
-        cacheService.set('scoreboard', data, 1);
+        // Cache historical dates longer (they won't change), today's games for 1 min
+        const ttl = dateStr ? 60 : 1;
+        cacheService.set(cacheKey, data, ttl);
         return data;
     } catch (error) {
         console.error('Error fetching scoreboard:', error);
@@ -195,15 +212,16 @@ export const getGameSummary = async (eventId) => {
     }
 };
 
-export const getNbaNews = async () => {
-    const cached = cacheService.get('nba_news');
+export const getNbaNews = async (limit = 15) => {
+    const cacheKey = `nba_news_${limit}`;
+    const cached = cacheService.get(cacheKey);
     if (cached) return cached;
 
     try {
-        const response = await fetch(`${BASE_URL}/news`);
+        const response = await fetch(`${BASE_URL}/news?limit=${limit}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
-        cacheService.set('nba_news', data, 15);
+        cacheService.set(cacheKey, data, 15);
         return data;
     } catch (error) {
         console.error('Error fetching NBA news:', error);
