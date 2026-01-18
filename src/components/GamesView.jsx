@@ -1,17 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import { getScoreboard } from '../services/espnApi';
 import GameCard from './GameCard';
-import { Loader2, Calendar, Tv } from 'lucide-react';
+import { Loader2, Calendar, Tv, ChevronLeft, ChevronRight } from 'lucide-react';
 import GameDetail from './GameDetail';
 
 const GamesView = () => {
     const [games, setGames] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedGameId, setSelectedGameId] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(new Date());
 
-    const fetchGames = async (force = false) => {
+    const isToday = (date) => {
+        const today = new Date();
+        return date.toDateString() === today.toDateString();
+    };
+
+    const formatDisplayDate = (date) => {
+        if (isToday(date)) return "Today";
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        if (date.toDateString() === tomorrow.toDateString()) return "Tomorrow";
+        return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    };
+
+    const changeDate = (delta) => {
+        const newDate = new Date(selectedDate);
+        newDate.setDate(newDate.getDate() + delta);
+        setSelectedDate(newDate);
+    };
+
+    const fetchGames = async (force = false, date = selectedDate) => {
         if (force) setLoading(true);
-        const data = await getScoreboard(force);
+        const data = await getScoreboard(force, date);
         if (data && data.events) {
             setGames(data.events);
         }
@@ -19,10 +42,14 @@ const GamesView = () => {
     };
 
     useEffect(() => {
-        fetchGames();
-        const interval = setInterval(() => fetchGames(false), 30000); // Background update
-        return () => clearInterval(interval);
-    }, []);
+        setLoading(true);
+        fetchGames(true, selectedDate);
+        // Only auto-refresh if viewing today's games
+        if (isToday(selectedDate)) {
+            const interval = setInterval(() => fetchGames(false, selectedDate), 30000);
+            return () => clearInterval(interval);
+        }
+    }, [selectedDate]);
 
     if (selectedGameId) {
         return <GameDetail eventId={selectedGameId} onBack={() => setSelectedGameId(null)} />;
@@ -41,7 +68,7 @@ const GamesView = () => {
         <div className="games-view">
             <div className="view-header">
                 <div className="header-top">
-                    <h1>Nightly Games</h1>
+                    <h1>NBA Games</h1>
                     <div className="header-actions">
                         <a
                             href="https://nba.footybite.to/nba-now"
@@ -51,12 +78,23 @@ const GamesView = () => {
                         >
                             <Tv size={16} /> Watch Now
                         </a>
-                        <button className="refresh-btn" onClick={() => fetchGames(true)}>
+                        <button className="refresh-btn" onClick={() => fetchGames(true, selectedDate)}>
                             Refresh
                         </button>
                     </div>
                 </div>
-                <p>Live scores, schedules, and detailed box scores for every matchup.</p>
+                <div className="date-nav">
+                    <button className="date-nav-btn" onClick={() => changeDate(-1)}>
+                        <ChevronLeft size={20} />
+                    </button>
+                    <button className="date-display" onClick={() => setSelectedDate(new Date())}>
+                        <Calendar size={16} />
+                        <span>{formatDisplayDate(selectedDate)}</span>
+                    </button>
+                    <button className="date-nav-btn" onClick={() => changeDate(1)}>
+                        <ChevronRight size={20} />
+                    </button>
+                </div>
             </div>
 
             <div className="games-grid">
@@ -70,7 +108,7 @@ const GamesView = () => {
             {games.length === 0 && !loading && (
                 <div className="empty-state">
                     <Calendar size={48} />
-                    <p>No games scheduled for today.</p>
+                    <p>No games scheduled for {formatDisplayDate(selectedDate).toLowerCase()}.</p>
                 </div>
             )}
         </div>
