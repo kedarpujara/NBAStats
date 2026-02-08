@@ -1,20 +1,47 @@
 import React, { useEffect, useState } from 'react';
 import { getNbaRedditFeed } from '../services/redditApi';
-import { Loader2, MessageSquare, ArrowUpCircle, Clock, ExternalLink } from 'lucide-react';
+import { Loader2, MessageSquare, ArrowUpCircle, Clock, ExternalLink, RefreshCw } from 'lucide-react';
 
 const RedditFeed = () => {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [after, setAfter] = useState(null);
+    const [error, setError] = useState(null);
+    const [hasMore, setHasMore] = useState(true);
 
     useEffect(() => {
-        const fetchFeed = async () => {
-            setLoading(true);
-            const data = await getNbaRedditFeed();
-            setPosts(data);
-            setLoading(false);
-        };
         fetchFeed();
     }, []);
+
+    const fetchFeed = async (loadMore = false) => {
+        try {
+            if (loadMore) {
+                setLoadingMore(true);
+            } else {
+                setLoading(true);
+            }
+            setError(null);
+
+            const limit = loadMore ? 20 : 10;
+            const afterToken = loadMore ? after : null;
+            const data = await getNbaRedditFeed(limit, afterToken);
+
+            if (loadMore) {
+                setPosts(prev => [...prev, ...data.posts]);
+            } else {
+                setPosts(data.posts);
+            }
+
+            setAfter(data.after);
+            setHasMore(!!data.after);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+            setLoadingMore(false);
+        }
+    };
 
     const formatTimestamp = (utc) => {
         const date = new Date(utc * 1000);
@@ -26,6 +53,17 @@ const RedditFeed = () => {
             <div className="loading-state">
                 <Loader2 className="animate-spin" size={40} />
                 <p>Fetching latest buzz from r/nba...</p>
+            </div>
+        );
+    }
+
+    if (error && posts.length === 0) {
+        return (
+            <div className="loading-state">
+                <p>Failed to load Reddit feed</p>
+                <button onClick={() => fetchFeed(false)} className="retry-button">
+                    <RefreshCw size={16} /> Retry
+                </button>
             </div>
         );
     }
@@ -70,6 +108,25 @@ const RedditFeed = () => {
                     </a>
                 ))}
             </div>
+
+            {hasMore && (
+                <div className="load-more-container">
+                    <button
+                        onClick={() => fetchFeed(true)}
+                        disabled={loadingMore}
+                        className="load-more-btn"
+                    >
+                        {loadingMore ? (
+                            <>
+                                <Loader2 className="animate-spin" size={16} />
+                                Loading...
+                            </>
+                        ) : (
+                            'Load More'
+                        )}
+                    </button>
+                </div>
+            )}
         </div>
     );
 };
