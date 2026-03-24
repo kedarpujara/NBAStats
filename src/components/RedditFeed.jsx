@@ -23,7 +23,7 @@ const RedditFeed = () => {
             }
             setError(null);
 
-            const limit = loadMore ? 20 : 10;
+            const limit = loadMore ? 20 : 20;
             const afterToken = loadMore ? after : null;
             const data = await getNbaRedditFeed(limit, afterToken);
 
