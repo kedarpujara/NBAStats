@@ -45,7 +45,7 @@ const parseRedditData = (data) => {
     };
 };
 
-const fetchViaLocalApi = async (limit, after) => {
+export const getNbaRedditFeed = async (limit = 25, after = null) => {
     let url = `/api/reddit?limit=${limit}`;
     if (after) url += `&after=${after}`;
 
@@ -54,45 +54,4 @@ const fetchViaLocalApi = async (limit, after) => {
 
     const data = await response.json();
     return parseRedditData(data);
-};
-
-const CORS_PROXIES = [
-    (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-    (url) => `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(url)}`,
-];
-
-const fetchViaProxy = async (proxyFn, redditUrl) => {
-    const proxyUrl = proxyFn(redditUrl);
-    const response = await fetchWithTimeout(proxyUrl);
-
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-    const data = await response.json();
-    return parseRedditData(data);
-};
-
-export const getNbaRedditFeed = async (limit = 10, after = null) => {
-    // Try the local Vercel serverless proxy first (most reliable)
-    try {
-        return await fetchViaLocalApi(limit, after);
-    } catch (err) {
-        console.warn('Local API proxy failed, trying CORS proxies:', err.message);
-    }
-
-    // Fallback to CORS proxies
-    const REDDIT_URL = `https://www.reddit.com/r/nba/hot.json?limit=${limit}${after ? `&after=${after}` : ''}`;
-
-    const proxyPromises = CORS_PROXIES.map(proxyFn =>
-        fetchViaProxy(proxyFn, REDDIT_URL).catch(err => {
-            console.warn('Proxy failed:', err.message);
-            throw err;
-        })
-    );
-
-    try {
-        return await Promise.any(proxyPromises);
-    } catch (error) {
-        console.error('All Reddit proxies failed');
-        throw new Error('Unable to load Reddit feed');
-    }
 };
