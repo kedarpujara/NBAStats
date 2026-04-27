@@ -3433,12 +3433,12 @@
   }
 }
 /* ============================================================
-   PLAYOFFS VIEW — compact vertical bracket
+   PLAYOFFS VIEW — full bracket, vertical-first
    ============================================================ */
 
 .playoffs-view {
   padding: 2rem;
-  max-width: 720px;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
@@ -3500,34 +3500,50 @@
   font-size: 0.9rem;
 }
 
-/* Bracket layout: stack of rounds, dense rows inside each */
+/* Bracket: conferences side-by-side on desktop, stacked on mobile,
+   then a single Finals block underneath. */
 .po-bracket {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.75rem;
   margin-top: 1.5rem;
 }
 
-.po-round-header {
+.po-confs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.po-conf {
   display: flex;
-  align-items: baseline;
-  gap: 0.6rem;
-  margin-bottom: 0.55rem;
-  padding: 0 0.25rem;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.po-conf-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.po-round-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 
 .po-round-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-muted);
-}
-
-.po-round-count {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  opacity: 0.7;
+  padding: 0 0.25rem;
 }
 
 .po-round-list {
@@ -3540,36 +3556,41 @@
   padding: 6px;
 }
 
-/* One series = one row */
-.po-series {
+/* One matchup row */
+.po-row {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.55rem 0.75rem;
+  padding: 0.5rem 0.65rem;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.025);
   transition: background var(--transition);
+  min-width: 0;
 }
 
-.po-series:hover {
-  background: rgba(255, 255, 255, 0.04);
+.po-row:hover {
+  background: rgba(255, 255, 255, 0.045);
 }
 
-.po-series.po-completed {
-  opacity: 0.78;
+.po-row.po-completed {
+  opacity: 0.85;
 }
 
-.po-series.po-live {
+.po-row.po-live {
   background: rgba(200, 16, 46, 0.08);
   border: 1px solid rgba(200, 16, 46, 0.25);
-  padding: calc(0.55rem - 1px) calc(0.75rem - 1px);
+  padding: calc(0.5rem - 1px) calc(0.65rem - 1px);
+}
+
+.po-row.po-tbd {
+  opacity: 0.55;
 }
 
 .po-team {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
   min-width: 0;
 }
 
@@ -3582,68 +3603,102 @@
   flex-direction: row-reverse;
 }
 
+.po-team-tbd {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 0 0.25rem;
+}
+
+.po-tbd-text {
+  opacity: 0.6;
+}
+
 .po-seed {
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   font-weight: 700;
   color: var(--text-muted);
   background: var(--bg-accent);
   border-radius: 4px;
-  padding: 0.1rem 0.32rem;
-  min-width: 1.4rem;
+  padding: 0.1rem 0.3rem;
+  min-width: 1.2rem;
   text-align: center;
   flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
 }
 
 .po-logo {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   object-fit: contain;
   flex-shrink: 0;
 }
 
+.po-team-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  line-height: 1.1;
+}
+
+.po-team-right .po-team-meta {
+  align-items: flex-end;
+}
+
 .po-abbr {
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: 0.02em;
   white-space: nowrap;
 }
 
-.po-winner .po-abbr {
+.po-record {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  margin-top: 1px;
+}
+
+.po-team-win .po-abbr {
   color: var(--accent-color);
 }
 
-.po-loser {
+.po-team-loss {
   opacity: 0.55;
 }
 
 .po-score {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.3rem;
   font-variant-numeric: tabular-nums;
-  padding: 0 0.25rem;
+  padding: 0 0.2rem;
+  min-width: 3.4rem;
+  justify-content: center;
 }
 
-.po-wins {
-  font-size: 1rem;
+.po-w {
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--text-primary);
   min-width: 1ch;
   text-align: center;
 }
 
-.po-wins-winner {
+.po-w-win {
   color: var(--accent-color);
 }
 
 .po-dash {
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 0.7rem;
+  min-width: 0.9rem;
 }
 
 .po-live-dot {
@@ -3654,12 +3709,42 @@
   animation: pulse-dot 1.2s ease-in-out infinite;
 }
 
+/* NBA Finals block */
+.po-finals {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--glass-border);
+}
+
+.po-finals-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #f59e0b;
+  margin: 0.25rem 0 0;
+}
+
+.po-finals-icon {
+  color: #f59e0b;
+}
+
+.po-finals-list {
+  background: rgba(245, 158, 11, 0.05);
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
 }
 
-/* Mobile */
+/* Mobile: stack conferences vertically and tighten everything */
 @media (max-width: 768px) {
   .playoffs-view {
     padding: var(--mobile-padding);
@@ -3673,31 +3758,45 @@
   }
 
   .po-bracket {
-    gap: 1.1rem;
+    gap: 1.25rem;
     margin-top: 1rem;
   }
 
-  .po-series {
-    padding: 0.5rem 0.55rem;
+  .po-confs {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .po-row {
+    padding: 0.45rem 0.5rem;
     gap: 0.35rem;
   }
 
   .po-logo {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
   }
 
   .po-abbr {
     font-size: 0.85rem;
   }
 
-  .po-wins {
-    font-size: 0.95rem;
+  .po-record {
+    font-size: 0.62rem;
+  }
+
+  .po-w {
+    font-size: 0.9rem;
   }
 
   .po-seed {
-    font-size: 0.6rem;
-    padding: 0.08rem 0.28rem;
-    min-width: 1.25rem;
+    font-size: 0.58rem;
+    padding: 0.08rem 0.26rem;
+    min-width: 1.1rem;
+  }
+
+  .po-score {
+    min-width: 2.8rem;
+    gap: 0.25rem;
   }
 }
