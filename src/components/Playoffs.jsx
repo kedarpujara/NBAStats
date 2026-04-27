@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { getPlayoffBracket } from '../services/espnApi';
-import { Loader2, RefreshCw, Trophy, Calendar, ChevronRight } from 'lucide-react';
+import { Loader2, RefreshCw, Trophy } from 'lucide-react';
 
 // Map ESPN week/round numbers to display labels
 const ROUND_LABELS = {
@@ -11,7 +11,7 @@ const ROUND_LABELS = {
     4: 'NBA Finals',
 };
 
-// Parse the raw scoreboard data into a de-duplicated list of series
+// De-duplicate the ESPN scoreboard's individual playoff games into one entry per series.
 function parseSeries(data) {
     if (!data || !data.events) return [];
 
@@ -26,162 +26,98 @@ function parseSeries(data) {
         const away = competitors.find(c => c.homeAway === 'away') || competitors[1];
         if (!home || !away) continue;
 
-        // Use sorted team IDs as the series key so we only keep one entry per matchup
         const seriesKey = [home.team?.id, away.team?.id].sort().join('_');
 
         const homeWins = home.series?.wins ?? 0;
         const awayWins = away.series?.wins ?? 0;
-        const seriesSummary = comp.series?.summary || '';
-        const seriesCompleted = comp.series?.completed === true;
-
-        // Prefer later game data (more wins means further along)
-        const existing = seriesMap[seriesKey];
         const totalWins = homeWins + awayWins;
+
+        const existing = seriesMap[seriesKey];
         const existingTotal = existing ? (existing.homeWins + existing.awayWins) : -1;
+        if (existing && totalWins <= existingTotal) continue;
 
-        if (!existing || totalWins > existingTotal) {
-            const round = event.week?.number || comp.playoffRound || 1;
-            const conferenceId = comp.conferenceCompetition?.id || null;
+        const round = event.week?.number || comp.playoffRound || 1;
 
-            seriesMap[seriesKey] = {
-                key: seriesKey,
-                round,
-                conferenceId,
-                home: {
-                    id: home.team?.id,
-                    name: home.team?.displayName || home.team?.name,
-                    shortName: home.team?.abbreviation,
-                    logo: home.team?.logos?.[0]?.href || home.team?.logo,
-                    wins: homeWins,
-                    seed: home.seed || home.curatedRank?.current || null,
-                },
-                away: {
-                    id: away.team?.id,
-                    name: away.team?.displayName || away.team?.name,
-                    shortName: away.team?.abbreviation,
-                    logo: away.team?.logos?.[0]?.href || away.team?.logo,
-                    wins: awayWins,
-                    seed: away.seed || away.curatedRank?.current || null,
-                },
-                summary: seriesSummary,
-                completed: seriesCompleted,
-                nextGame: {
-                    date: comp.date,
-                    status: comp.status?.type?.state,
-                    statusDetail: comp.status?.type?.shortDetail || comp.status?.displayClock,
-                },
-                seasonYear: data.season?.year,
-            };
-        }
+        const buildTeam = (c, wins) => ({
+            id: c.team?.id,
+            name: c.team?.shortDisplayName || c.team?.name || c.team?.displayName,
+            abbr: c.team?.abbreviation || (c.team?.name || '').slice(0, 3).toUpperCase(),
+            logo: c.team?.logos?.[0]?.href || c.team?.logo,
+            wins,
+            seed: c.seed || c.curatedRank?.current || null,
+        });
+
+        // Place lower-seed (better) team on the left for a consistent bracket read.
+        const homeTeam = buildTeam(home, homeWins);
+        const awayTeam = buildTeam(away, awayWins);
+        const homeSeed = homeTeam.seed ?? 99;
+        const awaySeed = awayTeam.seed ?? 99;
+        const top = homeSeed <= awaySeed ? homeTeam : awayTeam;
+        const bottom = homeSeed <= awaySeed ? awayTeam : homeTeam;
+
+        seriesMap[seriesKey] = {
+            key: seriesKey,
+            round,
+            homeWins,
+            awayWins,
+            top,
+            bottom,
+            summary: comp.series?.summary || '',
+            completed: comp.series?.completed === true,
+            isLive: comp.status?.type?.state === 'in',
+        };
     }
 
-    return Object.values(seriesMap).sort((a, b) => a.round - b.round);
+    return Object.values(seriesMap).sort((a, b) => {
+        if (a.round !== b.round) return a.round - b.round;
+        return (a.top.seed ?? 99) - (b.top.seed ?? 99);
+    });
 }
 
-function SeriesLeader({ summary }) {
-    if (!summary) return null;
-    const lower = summary.toLowerCase();
-    const tied = lower.includes('tied') || lower.includes('series tied');
-    if (tied) {
-        return <span className="series-status tied">Series Tied</span>;
-    }
-    return <span className="series-status leading">{summary}</span>;
-}
+const MAX_WINS = 4;
 
-const cardVariants = {
-    hidden: { opacity: 0, y: 16 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
+const rowVariants = {
+    hidden: { opacity: 0, y: 6 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.22, ease: 'easeOut' } },
 };
-
-function MatchupCard({ series }) {
-    const { home, away, summary, completed, nextGame, round } = series;
-    const maxWins = 4;
-    const isLive = nextGame?.status === 'in';
-
-    const winnerSide = completed
-        ? home.wins === maxWins ? 'home' : 'away'
-        : null;
-
-    return (
-        <motion.div
-            className={`playoff-card glass-card${completed ? ' completed' : ''}${isLive ? ' live' : ''}`}
-            variants={cardVariants}
-        >
-            {isLive && (
-                <div className="live-badge">
-                    <span className="live-dot" />
-                    LIVE
-                </div>
-            )}
-
-            <div className="matchup-teams">
-                {/* Away team (top seed shown first if seed data available) */}
-                <div className={`matchup-team${winnerSide === 'away' ? ' winner' : ''}${winnerSide === 'home' ? ' loser' : ''}`}>
-                    {away.logo && (
-                        <img src={away.logo} alt={away.shortName} className="team-logo-playoff" />
-                    )}
-                    <div className="team-info-playoff">
-                        {away.seed && <span className="seed-badge">{away.seed}</span>}
-                        <span className="team-name-playoff">{away.name}</span>
-                        <span className="team-abbr-playoff">{away.shortName}</span>
-                    </div>
-                    <div className="series-wins">
-                        {Array.from({ length: maxWins }).map((_, i) => (
-                            <div
-                                key={i}
-                                className={`win-pip${i < away.wins ? ' filled' : ''}`}
-                            />
-                        ))}
-                        <span className="wins-count">{away.wins}</span>
-                    </div>
-                </div>
-
-                <div className="versus-divider">
-                    <ChevronRight size={14} className="vs-arrow" />
-                </div>
-
-                {/* Home team */}
-                <div className={`matchup-team${winnerSide === 'home' ? ' winner' : ''}${winnerSide === 'away' ? ' loser' : ''}`}>
-                    {home.logo && (
-                        <img src={home.logo} alt={home.shortName} className="team-logo-playoff" />
-                    )}
-                    <div className="team-info-playoff">
-                        {home.seed && <span className="seed-badge">{home.seed}</span>}
-                        <span className="team-name-playoff">{home.name}</span>
-                        <span className="team-abbr-playoff">{home.shortName}</span>
-                    </div>
-                    <div className="series-wins">
-                        {Array.from({ length: maxWins }).map((_, i) => (
-                            <div
-                                key={i}
-                                className={`win-pip${i < home.wins ? ' filled' : ''}`}
-                            />
-                        ))}
-                        <span className="wins-count">{home.wins}</span>
-                    </div>
-                </div>
-            </div>
-
-            <div className="series-footer">
-                <SeriesLeader home={home} away={away} summary={summary} />
-                {completed && (
-                    <span className="series-final-badge">Series Over</span>
-                )}
-                {!completed && !isLive && nextGame?.statusDetail && (
-                    <span className="next-game-info">
-                        <Calendar size={11} />
-                        {nextGame.statusDetail}
-                    </span>
-                )}
-            </div>
-        </motion.div>
-    );
-}
 
 const containerVariants = {
     hidden: {},
-    visible: { transition: { staggerChildren: 0.07 } },
+    visible: { transition: { staggerChildren: 0.03 } },
 };
+
+function TeamSide({ team, isWinner, isLoser, align }) {
+    return (
+        <div className={`po-team po-team-${align}${isWinner ? ' po-winner' : ''}${isLoser ? ' po-loser' : ''}`}>
+            {team.seed != null && <span className="po-seed">{team.seed}</span>}
+            {team.logo && <img src={team.logo} alt="" className="po-logo" loading="lazy" />}
+            <span className="po-abbr">{team.abbr}</span>
+        </div>
+    );
+}
+
+function SeriesRow({ series }) {
+    const { top, bottom, completed, isLive } = series;
+    const topWinner = completed && top.wins === MAX_WINS;
+    const bottomWinner = completed && bottom.wins === MAX_WINS;
+
+    return (
+        <motion.div
+            className={`po-series${completed ? ' po-completed' : ''}${isLive ? ' po-live' : ''}`}
+            variants={rowVariants}
+        >
+            <TeamSide team={top} isWinner={topWinner} isLoser={bottomWinner} align="left" />
+
+            <div className="po-score">
+                <span className={`po-wins${topWinner ? ' po-wins-winner' : ''}`}>{top.wins}</span>
+                <span className="po-dash">{isLive ? <span className="po-live-dot" /> : '–'}</span>
+                <span className={`po-wins${bottomWinner ? ' po-wins-winner' : ''}`}>{bottom.wins}</span>
+            </div>
+
+            <TeamSide team={bottom} isWinner={bottomWinner} isLoser={topWinner} align="right" />
+        </motion.div>
+    );
+}
 
 const Playoffs = () => {
     const [seriesList, setSeriesList] = useState([]);
@@ -194,8 +130,7 @@ const Playoffs = () => {
         setError(false);
         const data = await getPlayoffBracket(force);
         if (data) {
-            const parsed = parseSeries(data);
-            setSeriesList(parsed);
+            setSeriesList(parseSeries(data));
             setSeasonYear(data.season?.year || null);
         } else {
             setError(true);
@@ -205,7 +140,6 @@ const Playoffs = () => {
 
     useEffect(() => { load(); }, []);
 
-    // Group series by round for display
     const rounds = {};
     for (const s of seriesList) {
         if (!rounds[s.round]) rounds[s.round] = [];
@@ -222,41 +156,14 @@ const Playoffs = () => {
         );
     }
 
-    if (error || seriesList.length === 0) {
-        return (
-            <div className="playoffs-view">
-                <div className="view-header">
-                    <div className="playoffs-header-content">
-                        <Trophy size={28} className="playoffs-trophy-icon" />
-                        <div>
-                            <h1>NBA Playoffs {seasonYear}</h1>
-                            <p className="view-subtext">Bracket & Series Results</p>
-                        </div>
-                    </div>
-                </div>
-                <div className="playoff-empty glass-card">
-                    <Trophy size={48} style={{ opacity: 0.3 }} />
-                    <h2>Playoffs Not Yet Available</h2>
-                    <p>
-                        Playoff data will appear here once the NBA postseason begins.
-                        Check back after the regular season ends.
-                    </p>
-                    <button className="refresh-btn" onClick={() => load(true)}>
-                        <RefreshCw size={16} /> Refresh
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="playoffs-view">
             <div className="view-header">
                 <div className="playoffs-header-content">
-                    <Trophy size={28} className="playoffs-trophy-icon" />
+                    <Trophy size={26} className="playoffs-trophy-icon" />
                     <div>
-                        <h1>NBA Playoffs {seasonYear}</h1>
-                        <p className="view-subtext">Bracket &amp; Series Results</p>
+                        <h1>Playoffs{seasonYear ? ` ${seasonYear}` : ''}</h1>
+                        <p className="view-subtext">Full bracket at a glance</p>
                     </div>
                 </div>
                 <button
@@ -269,24 +176,37 @@ const Playoffs = () => {
                 </button>
             </div>
 
-            {sortedRoundNums.map(roundNum => (
-                <section key={roundNum} className="playoff-round-section">
-                    <h2 className="round-label">
-                        {ROUND_LABELS[roundNum] || `Round ${roundNum}`}
-                        <span className="round-count">{rounds[roundNum].length} series</span>
-                    </h2>
-                    <motion.div
-                        className="playoff-grid"
-                        variants={containerVariants}
-                        initial="hidden"
-                        animate="visible"
-                    >
-                        {rounds[roundNum].map(series => (
-                            <MatchupCard key={series.key} series={series} />
-                        ))}
-                    </motion.div>
-                </section>
-            ))}
+            {(error || seriesList.length === 0) ? (
+                <div className="playoff-empty glass-card">
+                    <Trophy size={48} style={{ opacity: 0.3 }} />
+                    <h2>Playoffs not yet available</h2>
+                    <p>The bracket will appear here once the postseason begins.</p>
+                    <button className="refresh-btn" onClick={() => load(true)}>
+                        <RefreshCw size={16} /> Refresh
+                    </button>
+                </div>
+            ) : (
+                <motion.div
+                    className="po-bracket"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    {sortedRoundNums.map(roundNum => (
+                        <section key={roundNum} className="po-round">
+                            <div className="po-round-header">
+                                <span className="po-round-label">{ROUND_LABELS[roundNum] || `Round ${roundNum}`}</span>
+                                <span className="po-round-count">{rounds[roundNum].length}</span>
+                            </div>
+                            <div className="po-round-list">
+                                {rounds[roundNum].map(series => (
+                                    <SeriesRow key={series.key} series={series} />
+                                ))}
+                            </div>
+                        </section>
+                    ))}
+                </motion.div>
+            )}
         </div>
     );
 };
