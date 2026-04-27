@@ -3432,3 +3432,331 @@
     font-size: 0.65rem;
   }
 }
+/* ============================================================
+   PLAYOFFS VIEW
+   ============================================================ */
+
+.playoffs-view {
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.playoffs-header-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.playoffs-trophy-icon {
+  color: #f59e0b;
+  flex-shrink: 0;
+}
+
+.view-subtext {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+.playoffs-view .refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background: var(--bg-accent);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  transition: var(--transition);
+}
+
+.playoffs-view .refresh-btn:hover {
+  border-color: var(--accent-color);
+  color: var(--text-primary);
+}
+
+.playoff-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 4rem 2rem;
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.playoff-empty h2 {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+}
+
+.playoff-empty p {
+  color: var(--text-secondary);
+  max-width: 380px;
+  line-height: 1.6;
+}
+
+/* Round sections */
+.playoff-round-section {
+  margin-top: 2.5rem;
+}
+
+.round-label {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.round-count {
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: var(--bg-accent);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-muted);
+}
+
+/* Playoff card grid */
+.playoff-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+/* Individual matchup card */
+.playoff-card {
+  padding: 1.25rem 1.25rem 1rem;
+  border-radius: var(--border-radius);
+  position: relative;
+  overflow: hidden;
+}
+
+.playoff-card.live {
+  border-color: var(--nba-red);
+  box-shadow: 0 0 18px rgba(200, 16, 46, 0.25);
+}
+
+.playoff-card.completed {
+  opacity: 0.75;
+}
+
+.live-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--nba-red);
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--nba-red);
+  animation: pulse-dot 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Team rows inside a card */
+.matchup-teams {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.matchup-team {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+  transition: var(--transition);
+}
+
+.matchup-team.winner {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.matchup-team.loser {
+  opacity: 0.5;
+}
+
+.team-logo-playoff {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.team-info-playoff {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.seed-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-accent);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  flex-shrink: 0;
+}
+
+.team-name-playoff {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.team-abbr-playoff {
+  display: none;
+}
+
+/* Win pips */
+.series-wins {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.win-pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--bg-accent);
+  border: 1.5px solid var(--text-muted);
+  transition: var(--transition);
+}
+
+.win-pip.filled {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 6px var(--accent-glow);
+}
+
+.wins-count {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-left: 0.25rem;
+  min-width: 1ch;
+  text-align: center;
+}
+
+.versus-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  padding: 0 0.25rem;
+}
+
+.vs-arrow {
+  opacity: 0.4;
+}
+
+/* Series footer */
+.series-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--glass-border);
+}
+
+.series-status {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.series-status.leading {
+  color: var(--accent-color);
+}
+
+.series-status.tied {
+  color: var(--text-secondary);
+}
+
+.series-final-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--bg-accent);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+}
+
+.next-game-info {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .playoffs-view {
+    padding: var(--mobile-padding);
+    padding-bottom: calc(var(--mobile-padding) + 70px);
+  }
+
+  .playoff-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .team-name-playoff {
+    display: none;
+  }
+
+  .team-abbr-playoff {
+    display: inline;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .playoffs-view .view-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+}

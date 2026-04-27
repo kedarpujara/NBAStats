@@ -245,6 +245,24 @@ export const getStatLeaders = async () => {
     }
 };
 
+export const getPlayoffBracket = async (forceRefresh = false) => {
+    if (!forceRefresh) {
+        const cached = cacheService.get('playoff_bracket');
+        if (cached) return cached;
+    }
+
+    try {
+        const response = await fetch(`${BASE_URL}/scoreboard?seasontype=3&limit=100`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        cacheService.set('playoff_bracket', data, 5);
+        return data;
+    } catch (error) {
+        console.error('Error fetching playoff bracket:', error);
+        return null;
+    }
+};
+
 export const getPlayByPlay = async (eventId) => {
     const cacheKey = `play_by_play_${eventId}`;
     const cached = cacheService.get(cacheKey);
