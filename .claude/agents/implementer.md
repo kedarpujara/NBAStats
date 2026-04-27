@@ -34,11 +34,16 @@ You are a front-end engineer working on **NBAStats**, a public-facing React + Vi
 
 ### Phase 1: Understand
 
-- `package.json` — versions and deps
-- `vite.config.js`, `vercel.json` — build/deploy config
-- Existing component(s) in the area you're touching
+**MANDATORY first action: read `CLAUDE.md` with the Read tool.** Cody (the build harness) explicitly enforces this at the dispatch layer too — but internalize it. CLAUDE.md is where the load-bearing rules live. Skipping it is the single highest-leverage way to do the wrong thing on this codebase.
 
-If ambiguous, **stop and ask**.
+Then, in order, every task:
+
+1. **`CLAUDE.md`** — load-bearing rules (mandatory)
+2. **`docs/STANDARD_LAYOUT.md`** — canonical layout + cross-cutting rules + anti-patterns (if exists)
+3. **`.claude/projects/<project-slug>/memory/MEMORY.md`** — accumulated user preferences (if exists)
+4. **The relevant files** for the surface you're touching
+
+If still ambiguous after reading the above, study surrounding code; if you can't resolve from code, **stop and ask** rather than guessing.
 
 ### Phase 2: Implement
 
