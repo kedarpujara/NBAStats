@@ -3433,19 +3433,19 @@
   }
 }
 /* ============================================================
-   PLAYOFFS VIEW
+   PLAYOFFS VIEW — compact vertical bracket
    ============================================================ */
 
 .playoffs-view {
   padding: 2rem;
-  max-width: 1100px;
+  max-width: 720px;
   margin: 0 auto;
 }
 
 .playoffs-header-content {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .playoffs-trophy-icon {
@@ -3455,20 +3455,20 @@
 
 .view-subtext {
   color: var(--text-secondary);
-  font-size: 0.9rem;
-  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
 }
 
 .playoffs-view .refresh-btn {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.5rem 1rem;
+  padding: 0.45rem 0.9rem;
   border-radius: 8px;
   background: var(--bg-accent);
   border: 1px solid var(--glass-border);
   color: var(--text-secondary);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   transition: var(--transition);
 }
 
@@ -3483,91 +3483,172 @@
   align-items: center;
   justify-content: center;
   gap: 1.25rem;
-  padding: 4rem 2rem;
+  padding: 3rem 1.5rem;
   text-align: center;
   margin-top: 1.5rem;
 }
 
 .playoff-empty h2 {
-  font-size: 1.3rem;
+  font-size: 1.15rem;
   color: var(--text-primary);
 }
 
 .playoff-empty p {
   color: var(--text-secondary);
-  max-width: 380px;
-  line-height: 1.6;
+  max-width: 360px;
+  line-height: 1.55;
+  font-size: 0.9rem;
 }
 
-/* Round sections */
-.playoff-round-section {
-  margin-top: 2.5rem;
-}
-
-.round-label {
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
+/* Bracket layout: stack of rounds, dense rows inside each */
+.po-bracket {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
 }
 
-.round-count {
-  font-size: 0.75rem;
-  font-weight: 500;
-  background: var(--bg-accent);
-  border: 1px solid var(--glass-border);
-  border-radius: 999px;
-  padding: 0.15rem 0.6rem;
-  letter-spacing: 0;
-  text-transform: none;
+.po-round-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.55rem;
+  padding: 0 0.25rem;
+}
+
+.po-round-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   color: var(--text-muted);
 }
 
-/* Playoff card grid */
-.playoff-grid {
+.po-round-count {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.po-round-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 6px;
+}
+
+/* One series = one row */
+.po-series {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1rem;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.025);
+  transition: background var(--transition);
 }
 
-/* Individual matchup card */
-.playoff-card {
-  padding: 1.25rem 1.25rem 1rem;
-  border-radius: var(--border-radius);
-  position: relative;
-  overflow: hidden;
+.po-series:hover {
+  background: rgba(255, 255, 255, 0.04);
 }
 
-.playoff-card.live {
-  border-color: var(--nba-red);
-  box-shadow: 0 0 18px rgba(200, 16, 46, 0.25);
+.po-series.po-completed {
+  opacity: 0.78;
 }
 
-.playoff-card.completed {
-  opacity: 0.75;
+.po-series.po-live {
+  background: rgba(200, 16, 46, 0.08);
+  border: 1px solid rgba(200, 16, 46, 0.25);
+  padding: calc(0.55rem - 1px) calc(0.75rem - 1px);
 }
 
-.live-badge {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
+.po-team {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.po-team-left {
+  justify-content: flex-start;
+}
+
+.po-team-right {
+  justify-content: flex-end;
+  flex-direction: row-reverse;
+}
+
+.po-seed {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-accent);
+  border-radius: 4px;
+  padding: 0.1rem 0.32rem;
+  min-width: 1.4rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.po-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.po-abbr {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.po-winner .po-abbr {
+  color: var(--accent-color);
+}
+
+.po-loser {
+  opacity: 0.55;
+}
+
+.po-score {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--nba-red);
+  font-variant-numeric: tabular-nums;
+  padding: 0 0.25rem;
 }
 
-.live-dot {
-  width: 7px;
-  height: 7px;
+.po-wins {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  min-width: 1ch;
+  text-align: center;
+}
+
+.po-wins-winner {
+  color: var(--accent-color);
+}
+
+.po-dash {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.7rem;
+}
+
+.po-live-dot {
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: var(--nba-red);
   animation: pulse-dot 1.2s ease-in-out infinite;
@@ -3578,160 +3659,6 @@
   50% { opacity: 0.3; }
 }
 
-/* Team rows inside a card */
-.matchup-teams {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.matchup-team {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.6rem 0.75rem;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.03);
-  transition: var(--transition);
-}
-
-.matchup-team.winner {
-  background: rgba(59, 130, 246, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-}
-
-.matchup-team.loser {
-  opacity: 0.5;
-}
-
-.team-logo-playoff {
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-
-.team-info-playoff {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 0;
-}
-
-.seed-badge {
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  background: var(--bg-accent);
-  border-radius: 4px;
-  padding: 0.1rem 0.35rem;
-  flex-shrink: 0;
-}
-
-.team-name-playoff {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.team-abbr-playoff {
-  display: none;
-}
-
-/* Win pips */
-.series-wins {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  flex-shrink: 0;
-  margin-left: auto;
-}
-
-.win-pip {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--bg-accent);
-  border: 1.5px solid var(--text-muted);
-  transition: var(--transition);
-}
-
-.win-pip.filled {
-  background: var(--accent-color);
-  border-color: var(--accent-color);
-  box-shadow: 0 0 6px var(--accent-glow);
-}
-
-.wins-count {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-left: 0.25rem;
-  min-width: 1ch;
-  text-align: center;
-}
-
-.versus-divider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-  padding: 0 0.25rem;
-}
-
-.vs-arrow {
-  opacity: 0.4;
-}
-
-/* Series footer */
-.series-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--glass-border);
-}
-
-.series-status {
-  font-size: 0.78rem;
-  font-weight: 600;
-}
-
-.series-status.leading {
-  color: var(--accent-color);
-}
-
-.series-status.tied {
-  color: var(--text-secondary);
-}
-
-.series-final-badge {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  background: var(--bg-accent);
-  border: 1px solid var(--glass-border);
-  border-radius: 999px;
-  padding: 0.15rem 0.6rem;
-}
-
-.next-game-info {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
 /* Mobile */
 @media (max-width: 768px) {
   .playoffs-view {
@@ -3739,24 +3666,38 @@
     padding-bottom: calc(var(--mobile-padding) + 70px);
   }
 
-  .playoff-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .team-name-playoff {
-    display: none;
-  }
-
-  .team-abbr-playoff {
-    display: inline;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-primary);
-  }
-
   .playoffs-view .view-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .po-bracket {
+    gap: 1.1rem;
+    margin-top: 1rem;
+  }
+
+  .po-series {
+    padding: 0.5rem 0.55rem;
+    gap: 0.35rem;
+  }
+
+  .po-logo {
+    width: 22px;
+    height: 22px;
+  }
+
+  .po-abbr {
+    font-size: 0.85rem;
+  }
+
+  .po-wins {
+    font-size: 0.95rem;
+  }
+
+  .po-seed {
+    font-size: 0.6rem;
+    padding: 0.08rem 0.28rem;
+    min-width: 1.25rem;
   }
 }
