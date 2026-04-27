@@ -6,6 +6,7 @@ import Standings from './components/Standings';
 import PlayerSearch from './components/PlayerSearch';
 import RedditFeed from './components/RedditFeed';
 import News from './components/News';
+import Playoffs from './components/Playoffs';
 import './App.css';
 
 function App() {
@@ -23,6 +24,8 @@ function App() {
         return <News />;
       case 'reddit':
         return <RedditFeed />;
+      case 'playoffs':
+        return <Playoffs />;
       default:
         return <GamesView />;
     }
