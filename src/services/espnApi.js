@@ -251,8 +251,20 @@ export const getPlayoffBracket = async (forceRefresh = false) => {
         if (cached) return cached;
     }
 
+    // ESPN's /scoreboard defaults to a narrow date window (today/this week), so
+    // without an explicit `dates` range we only get the games tipping off now —
+    // series that didn't play today are absent and render as 0-0.
+    // Span Apr 1 → Jul 1 of the season-end year to capture the entire postseason
+    // (play-in through Finals).
+    const now = new Date();
+    const seasonEndYear = now.getMonth() >= 9 ? now.getFullYear() + 1 : now.getFullYear();
+    const start = `${seasonEndYear}0401`;
+    const end = `${seasonEndYear}0701`;
+
     try {
-        const response = await fetch(`${BASE_URL}/scoreboard?seasontype=3&limit=100`);
+        const response = await fetch(
+            `${BASE_URL}/scoreboard?seasontype=3&limit=300&dates=${start}-${end}`
+        );
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         cacheService.set('playoff_bracket', data, 5);
