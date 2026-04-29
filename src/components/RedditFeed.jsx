@@ -36,7 +36,12 @@ const RedditFeed = () => {
             setAfter(data.after);
             setHasMore(!!data.after);
         } catch (err) {
-            setError(err.message);
+            console.error('[RedditFeed] fetchFeed failed', {
+                loadMore,
+                message: err?.message,
+                cause: err?.cause?.message,
+            });
+            setError(err?.message || 'Unknown error');
         } finally {
             setLoading(false);
             setLoadingMore(false);
@@ -61,6 +66,7 @@ const RedditFeed = () => {
         return (
             <div className="loading-state">
                 <p>Failed to load Reddit feed</p>
+                <p className="reddit-error-detail">{error}</p>
                 <button onClick={() => fetchFeed(false)} className="retry-button">
                     <RefreshCw size={16} /> Retry
                 </button>
