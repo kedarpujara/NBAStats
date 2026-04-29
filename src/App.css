@@ -1262,6 +1262,15 @@
   border-color: var(--accent-color);
 }
 
+.reddit-error-detail {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  opacity: 0.8;
+  max-width: 32rem;
+  text-align: center;
+}
+
 /* Extra Info */
 .extra-info {
   padding: 1.5rem;
