@@ -20,22 +20,28 @@ const parseRedditData = (data) => {
     }
 
     const posts = data.data.children.map(child => {
-        const post = child.data;
+        const post = child.data || {};
 
         let thumbnail = post.thumbnail;
-        if (thumbnail === 'self' || thumbnail === 'default' || !thumbnail?.startsWith('http')) {
+        if (thumbnail === 'self' || thumbnail === 'default' || !thumbnail?.startsWith?.('http')) {
             thumbnail = null;
         }
+
+        // The /api/reddit proxy already returns a fully-qualified Reddit comments URL
+        // in `url`. Falling back to permalink-based construction handles a future
+        // shape change defensively without producing `https://www.reddit.comundefined`.
+        const url = post.url
+            || (post.permalink ? `https://www.reddit.com${post.permalink}` : '');
 
         return {
             id: post.id,
             title: post.title,
-            url: `https://www.reddit.com${post.permalink}`,
+            url,
             author: post.author,
-            ups: post.ups,
-            num_comments: post.num_comments,
+            ups: post.ups || 0,
+            num_comments: post.num_comments || 0,
             thumbnail: thumbnail,
-            created: post.created_utc
+            created: post.created ?? post.created_utc
         };
     });
 
