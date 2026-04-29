@@ -33,8 +33,9 @@ const cleanThumbnail = (thumb) => {
     return thumb;
 };
 
-const fetchFromJson = async (limit) => {
-    const url = `https://www.reddit.com/r/nba/hot.json?limit=${limit}&raw_json=1`;
+const fetchFromJson = async (limit, after) => {
+    let url = `https://www.reddit.com/r/nba/hot.json?limit=${limit}&raw_json=1`;
+    if (after) url += `&after=${encodeURIComponent(after)}`;
     const start = Date.now();
 
     const response = await fetch(url, {
@@ -86,8 +87,9 @@ const fetchFromJson = async (limit) => {
     };
 };
 
-const fetchFromRss = async (limit) => {
-    const url = `https://www.reddit.com/r/nba/hot.rss?limit=${limit}`;
+const fetchFromRss = async (limit, after) => {
+    let url = `https://www.reddit.com/r/nba/hot.rss?limit=${limit}`;
+    if (after) url += `&after=${encodeURIComponent(after)}`;
     const start = Date.now();
 
     const response = await fetch(url, {
@@ -150,21 +152,21 @@ const fetchFromRss = async (limit) => {
 };
 
 export default async function handler(req, res) {
-    const { limit = 25 } = req.query;
+    const { limit = 25, after } = req.query;
     const requestStart = Date.now();
-    log('info', 'request received', { limit });
+    log('info', 'request received', { limit, after: after || null });
 
     let result;
     let source = 'json';
     let jsonError = null;
 
     try {
-        result = await fetchFromJson(limit);
+        result = await fetchFromJson(limit, after);
     } catch (err) {
         jsonError = { message: err.message, status: err.status, bodySnippet: err.bodySnippet };
         log('warn', 'json path failed, falling back to rss', jsonError);
         try {
-            result = await fetchFromRss(limit);
+            result = await fetchFromRss(limit, after);
             source = 'rss';
         } catch (rssErr) {
             log('error', 'both json and rss paths failed', {
