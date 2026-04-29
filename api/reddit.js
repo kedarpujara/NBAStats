@@ -73,7 +73,7 @@ const fetchFromJson = async (limit) => {
                 ups: typeof post.ups === 'number' ? post.ups : 0,
                 num_comments: typeof post.num_comments === 'number' ? post.num_comments : 0,
                 thumbnail: cleanThumbnail(post.thumbnail),
-                created: post.created_utc || 0,
+                created: post.created_utc ?? 0,
             },
         };
     });

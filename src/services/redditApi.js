@@ -39,13 +39,13 @@ const parseRedditData = (data) => {
         // The /api/reddit proxy already returns a fully-qualified Reddit comments URL
         // in `url`. Falling back to permalink-based construction handles a future
         // shape change defensively without producing `https://www.reddit.comundefined`.
-        const url = post.url
+        const postUrl = post.url
             || (post.permalink ? `https://www.reddit.com${post.permalink}` : '');
 
         return {
             id: post.id,
             title: post.title,
-            url,
+            url: postUrl,
             author: post.author,
             ups: post.ups || 0,
             num_comments: post.num_comments || 0,
