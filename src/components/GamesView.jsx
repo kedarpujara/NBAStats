@@ -71,7 +71,7 @@ const GamesView = () => {
                     <h1>NBA Games</h1>
                     <div className="header-actions">
                         <a
-                            href="https://nba.footybite.to/nba-now"
+                            href="https://nba1.footybite.to/"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="watch-btn"
